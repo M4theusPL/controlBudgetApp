@@ -1,15 +1,34 @@
 ﻿@page "/newtransaction"
 
+<datalist id="type_transaction">
+    <option value="wydatek"></option>
+    <option value="inwestycja"></option>
+    <option value="przychód"></option>
+</datalist>
+
 <h3>Dodaj nową transakcję</h3>
 
-Nazwa transakcji
-<input />
-Opis
-<input />
-Kwota
-<input />
-data
-<input />
+
+<!-- wartości maksymalne do ustawienia-->
+Nazwa transakcji <input name="nameTransaction"/>
+Opis (maksymalnie 250 znaków) <input maxlength="250"/>
+Kwota <input type="number" min="0.00" step="0.01"/>
+Data transakcji <input type="date" max="2099-12-31"/> 
+<br />
+
+
+
+Nazwa powiadomienia <input maxlength="40" />
+Treść powiadmienia <input maxlength="150" />
+Data powiadomienia <input type="datetime-local" />
+
+Typ transakcji <input list="type_transaction" />
+
+<br />
+<br />
+
+<!-- add file -->
+<input type="file" placeholder="pliczek"/> 
 
 <button>Dodaj transakcję</button>
 
