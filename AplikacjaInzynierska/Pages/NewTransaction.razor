@@ -10,28 +10,121 @@
 
 
 <!-- wartości maksymalne do ustawienia-->
-Nazwa transakcji <input name="nameTransaction"/>
-Opis (maksymalnie 250 znaków) <input maxlength="250"/>
-Kwota <input type="number" min="0.00" step="0.01"/>
-Data transakcji <input type="date" max="2099-12-31"/> 
+<!--
+
+
+Data transakcji <InputDate type="date" max="2099-12-31" /> 
 <br />
 
 
 
-Nazwa powiadomienia <input maxlength="40" />
-Treść powiadmienia <input maxlength="150" />
-Data powiadomienia <input type="datetime-local" />
+-->
 
-Typ transakcji <input list="type_transaction" />
+<EditForm Model="@model">
+    
+    <p>
+        Nazwa transakcji <InputText id="nameTransaction" @bind-Value="model.name"/>  
+    </p>
 
-<br />
-<br />
+    <p>
+        Opis (maksymalnie 250 znaków) <InputText maxlength="250" @bind-Value="model.description"/>
+    </p>
+    
+    <p>
+        Kwota <InputNumber min="0.00" step="0.01" @bind-Value="model.amount" />
+    </p>
+    
+    <p>
+        Tyb transakcji
+        <InputSelect @bind-Value="model.listTransaction">
+            @foreach(var value in Enum.GetValues(typeof(listTransaction)))
+            {
+                <option value="value.listTransaction">@value</option>
+            }
+        </InputSelect>
+    </p>
+    
+    <p>
+        Nazwa powiadomienia <InputText maxlength="40" @bind-Value="model.notification" />
+    </p>
 
-<!-- add file -->
-<input type="file" placeholder="pliczek"/> 
+    <p>
+        Treść powiadmienia <InputText maxlength="150" @bind-Value="model.title_notification" />
+    </p>
 
-<button>Dodaj transakcję</button>
+    <p>
+        Data powiadomienia <InputText type="datetime-local" @bind-Value="model.date_notification" />
+    </p>
+    
+    <!-- add file -->
+    <p>
+        <InputFile />
+    </p>
+
+    <p>
+        <button @onclick="model.aktualizacja" >Dodaj transakcję</button>
+    </p>
+
+    <p>
+        @model.nazwa
+    </p>
+
+    <p>
+        @model.opis
+    </p>
+
+    <p>
+        @model.amount
+    </p>
+
+    <p>
+        @model.type_transaction
+    </p>
+
+</EditForm>
+
+
 
 @code {
 
+
+
+    Model model = new Model();
+
+    class Model
+    {
+        public listTransaction listTransaction { get; set; }
+        public string? name { get; set; }
+        public string? description { get; set; }
+        public float? amount { get; set; }
+        public string? notification { get; set; }
+        public string? title_notification { get; set; }
+        public string? date_notification { get; set; }
+        public string? type_transaction { get; set; }
+
+
+        public string? nazwa = "";
+        public string? opis = "";
+        public float? kwota = 0;
+        public string? typ_transakcji = "";
+
+
+        public void aktualizacja()
+        {
+            nazwa = $"{name}";
+            opis = $"{description}";
+            kwota = amount;
+            typ_transakcji = $"{type_transaction}";
+        }
+    }
+
+    enum listTransaction
+    {
+        Wydatek,
+        Inwestycja,
+        Przychód
+    }
+
+    
+    
 }
