@@ -35,13 +35,15 @@ Data transakcji <InputDate type="date" max="2099-12-31" />
     </p>
     
     <p>
-        Tyb transakcji
-        <InputSelectEnum @bind-Value="model.listTransaction" />
-@*            @foreach(var transaction in Enum.GetValues(typeof(listTransaction)))
+        Tyb 
+        <InputSelect @bind-Value="model.ListTransaction" >
+            @foreach (var transaction in Enum.GetValues(typeof(ListTransaction)))
             {
                 <option value="@transaction">@transaction</option>
             }
-        </InputSelectEnum>*@
+        </InputSelect>
+
+
     </p>
     
     <p>
@@ -93,19 +95,17 @@ Data transakcji <InputDate type="date" max="2099-12-31" />
 
     class Model
     {
-
-        public listTransaction listTransaction { get; set; }
+        public ListTransaction ListTransaction { get; set; }
         public string? name { get; set; }
         public string? description { get; set; }
-        public float? amount { get; set; }
+        public float amount { get; set; }
         public string? notification { get; set; }
         public string? title_notification { get; set; }
         public string? date_notification { get; set; }
-        public string? type_transaction { get; set; }
 
         public string? nazwa = "";
         public string? opis = "";
-        public float? kwota = 0;
+        public float? kwota;
         public string? typ_transakcji = "";
 
         public void aktualizacja()
@@ -113,11 +113,11 @@ Data transakcji <InputDate type="date" max="2099-12-31" />
             nazwa = $"{name}";
             opis = $"{description}";
             kwota = amount;
-            typ_transakcji = $"{listTransaction}";
+            typ_transakcji = $"{ListTransaction}";
         }
     }
 
-    enum listTransaction
+    enum ListTransaction
     {
         Wydatek,
         Inwestycja,
