@@ -8,18 +8,6 @@
 
 <h3>Dodaj nową transakcję</h3>
 
-
-<!-- wartości maksymalne do ustawienia-->
-<!--
-
-
-Data transakcji <InputDate type="date" max="2099-12-31" /> 
-<br />
-
-
-
--->
-
 <EditForm Model="model">
     
     <p>
@@ -33,17 +21,19 @@ Data transakcji <InputDate type="date" max="2099-12-31" />
     <p>
         Kwota <InputNumber min="0.00" step="0.01" @bind-Value="model.amount" />
     </p>
+
+    <p>
+        Data transakcji <InputText type="date" @bind-Value="model.date_transaction" />
+    </p>
     
     <p>
         Tyb 
-        <InputSelect @bind-Value="model.ListTransaction" >
-            @foreach (var transaction in Enum.GetValues(typeof(ListTransaction)))
+        <InputSelect @bind-Value="model.ListTransactions" >
+            @foreach (var Transaction in Enum.GetValues(typeof(ListTransactions)))
             {
-                <option value="@transaction">@transaction</option>
+                <option value="@Transaction">@Transaction</option>
             }
         </InputSelect>
-
-
     </p>
     
     <p>
@@ -55,38 +45,33 @@ Data transakcji <InputDate type="date" max="2099-12-31" />
     </p>
 
     <p>
-        Data powiadomienia <InputText type="datetime-local" @bind-Value="model.date_notification" />
+        Data powiadomienia <InputText type="date" @bind-Value="model.date_notification" />
+    </p>
+
+    <p>
+        Godzina powiadomienia <InputText type="time" @bind-Value="model.time_notification" @bind-Value:format="HH:mm"/>
     </p>
     
     <!-- add file -->
     <p>
-        <InputFile />
+        <InputFile OnChange="@LoadFiles"/>
     </p>
 
     <p>
         <button @onclick="model.aktualizacja" >Dodaj transakcję</button>
     </p>
 
-    <p>
-        @model.nazwa
-    </p>
-
-    <p>
-        @model.opis
-    </p>
-
-    <p>
-        @model.amount
-    </p>
-
-    <p>
-        @model.typ_transakcji
-    </p>
-
+            @model.nazwa
+            @model.opis
+            @model.kwota
+            @model.data_transakcji
+            @model.typ_transakcji
+            @model.powiadomienie
+            @model.tytul_powiadomienia
+            @model.dataa
+            @model.czas
 
 </EditForm>
-
-
 
 
 @code {
@@ -95,33 +80,50 @@ Data transakcji <InputDate type="date" max="2099-12-31" />
 
     class Model
     {
-        public ListTransaction ListTransaction { get; set; }
+        public ListTransactions ListTransactions { get; set; }
         public string? name { get; set; }
         public string? description { get; set; }
         public float amount { get; set; }
+        public string? date_transaction { get; set; }
         public string? notification { get; set; }
         public string? title_notification { get; set; }
         public string? date_notification { get; set; }
+        public string? time_notification { get; set; }
 
         public string? nazwa = "";
         public string? opis = "";
         public float? kwota;
+        public string? data_transakcji;
         public string? typ_transakcji = "";
+        public string? powiadomienie = "";
+        public string? tytul_powiadomienia = "";
+        public string? dataa;
+        public string? czas;
 
         public void aktualizacja()
         {
             nazwa = $"{name}";
             opis = $"{description}";
             kwota = amount;
-            typ_transakcji = $"{ListTransaction}";
+            data_transakcji = date_transaction; 
+            typ_transakcji = $"{ListTransactions}";
+            powiadomienie = $"{notification}";
+            tytul_powiadomienia = $"{title_notification}";
+            dataa = date_notification;
+            czas = time_notification;
         }
     }
 
-    enum ListTransaction
+    enum ListTransactions
     {
         Wydatek,
         Inwestycja,
         Przychód
+    }
+
+    private void LoadFiles (InputFileChangeEventArgs e)
+    {
+        
     }
 
     
