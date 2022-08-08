@@ -2,10 +2,45 @@
 
 <h3>Ustawienia konta</h3>
 
-<img alt="zdjecie"/>
+<EditForm Model="model">
+    <p>
+        Imie: <InputText @bind-Value="model.name" />
+    </p>
 
-<button>Edytuj dane</button>
+    <p>
+        Nazwisko: <InputText @bind-Value="model.surname" />
+    </p>
+
+    <p>
+        Data urodzenia:  <InputDate @bind-Value="model.birthday" />
+    </p>
+    
+    <p>
+        E-mail: <InputText @bind-Value="model.email" />
+    </p>
+
+    <p>
+        <img src="Images/user.jpg" zdjecie"/>
+        <InputFile/>
+    </p>
+
+    <button>Edytuj dane</button>
+</EditForm>
+
+<button>
+    <NavLink href="passwordchange">
+        Zmień hasło
+    </NavLink>
+</button>
 
 @code {
+    Model model = new Model();
 
+    class Model
+    {
+        public string? name { get; set; } = "name";
+        public string? surname { get; set; } = "surname";
+        public DateTime birthday { get; set; } = new DateTime (2005, 07, 05);
+        public string? email { get; set; } = "email@email.com";
+    }
 }
