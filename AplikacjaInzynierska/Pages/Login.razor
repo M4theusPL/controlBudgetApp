@@ -1,0 +1,51 @@
+﻿@layout LoginLayout
+@page "/"
+
+@inject NavigationManager Navigation
+
+<div class="row justify-content-md-center">
+    <div class="col-1">
+        <EditForm Model="model">
+            Login <InputText @bind-Value="model.login" />
+            Hasło <InputText @bind-Value="model.password" />
+            <button class="nav-link btn btn-link" onclick="Zaloguj()">
+                <NavLink href="/home">
+                    Zaloguj się
+                </NavLink>
+            </button>
+            <button>
+                <NavLink href="/">
+                    Rejestracja
+                </NavLink>
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+
+@model.napis
+
+
+@code {
+    Model model = new Model();
+
+    class Model
+    {
+        public string? login { get; set; }
+        public string? password { get; set; }
+        public string napis = "";
+    }
+
+    private async Task Zaloguj(MouseEventArgs args)
+    {
+        if (model.login == "admin")
+        {
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            model.napis = "error";
+        }
+
+    }
+}
