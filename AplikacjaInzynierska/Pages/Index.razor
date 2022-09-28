@@ -32,12 +32,8 @@ Welcome to your new app.
 
     private async Task DisplayGreetingAlert()
     {
-        
-        if (authenticationState is not null)
-        {
-            var authState = await authenticationState;
-            var message = $"Hello {authState.User.Identity.Name}";
-            await js.InvokeVoidAsync("alert", message);
-        }
+        var authState = await authenticationState;
+        var message = $"Hello {authState.User.Identity.Name}";
+        await js.InvokeVoidAsync("alert", message);
     }
 }
