@@ -1,51 +1,46 @@
-﻿@layout LoginLayout
-@page "/"
-
-@inject NavigationManager Navigation
+﻿@*@layout LoginLayout*@
+@page "/login"
+@using AplikacjaInzynierska.Authentication
+@inject UserAccountService userAccountService
+@inject IJSRuntime js
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navManager
 
 <div class="row justify-content-md-center">
     <div class="col-1">
-        <EditForm Model="model">
-            Login <InputText @bind-Value="model.login" />
-            Hasło <InputText @bind-Value="model.password" />
-            <button class="nav-link btn btn-link" onclick="Zaloguj()">
-                <NavLink href="/home">
+            Login <InputText @bind-Value="model.UserName" />
+            Hasło <InputText @bind-Value="model.Password" />
+            <button class="nav-link btn btn-link" @onclick="Authenticate">
                     Zaloguj się
-                </NavLink>
             </button>
-            <button>
-                <NavLink href="/">
-                    Rejestracja
-                </NavLink>
-            </button>
-        </EditForm>
     </div>
 </div>
 
 
-@model.napis
-
-
 @code {
-    Model model = new Model();
-
-    class Model
+    private class Model
     {
-        public string? login { get; set; }
-        public string? password { get; set; }
-        public string napis = "";
+        public string UserName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 
-    private async Task Zaloguj(MouseEventArgs args)
+    private Model model = new Model();
+
+    private async Task Authenticate()
     {
-        if (model.login == "admin")
+        var userAccount = userAccountService.GetByUserName(model.UserName);
+        if(userAccount == null || userAccount.Password != model.Password)
         {
-            Navigation.NavigateTo("/");
-        }
-        else
-        {
-            model.napis = "error";
+            await js.InvokeVoidAsync("alert", "Invalid User Name or Password");
+            return;
         }
 
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+            {
+                UserName = userAccount.UserName,
+                Role = userAccount.Role
+            });
+            navManager.NavigateTo("/", true);
     }
 }

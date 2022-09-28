@@ -1,4 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using AplikacjaInzynierska.Authentication
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navManager
 
 <PageTitle>Aplikacja Inżynierska</PageTitle>
 
@@ -15,6 +18,14 @@
             <NavLink class="nav-link" href="/useraccount">
                 <span class="oi oi-person" aria-hidden="true"></span> Moje konto
             </NavLink>
+            <AuthorizeView>
+                <Authorized>
+                    <a @onclick="Logout" href="javascript:void(0)">Logout</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="/login">Login</a>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">
@@ -22,3 +33,12 @@
         </article>
     </main>
 </div>
+
+@code{
+    private async Task Logout()
+    {
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(null)!;
+        navManager.NavigateTo("/", true);
+    }
+}
