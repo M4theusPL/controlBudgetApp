@@ -6,13 +6,16 @@
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
 
+
 <div class="row justify-content-md-center">
     <div class="col-1">
+        <EditForm Model="@model">
             Login <InputText @bind-Value="model.UserName" />
             Hasło <InputText @bind-Value="model.Password" />
             <button class="nav-link btn btn-link" @onclick="Authenticate">
                     Zaloguj się
             </button>
+        </EditForm>
     </div>
 </div>
 
