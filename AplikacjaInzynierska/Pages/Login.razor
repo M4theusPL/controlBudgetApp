@@ -7,24 +7,33 @@
 @inject NavigationManager navManager
 
 
-<div class="row justify-content-md-center">
-    <div class="col-1">
+@*<div class="row justify-content-md-center">
+    <div class="col-1">*@
         <EditForm Model="@model">
-            Login <InputText @bind-Value="model.UserName" />
-            Hasło <InputText @bind-Value="model.Password" />
-            <button class="nav-link btn btn-link" @onclick="Authenticate">
-                    Zaloguj się
-            </button>
+            <div class="row justify-content-md-center">
+            <div class="col-3">
+                <div class="input-group">
+                Login <InputText class="form-control" @bind-Value="model.UserName" placeholder="Login" />
+            </div>
+            Hasło <InputText @bind-Value="model.Password" placeholder="Hasło" />
+        @*<button class="nav-link btn btn-link" @onclick="Authenticate">
+                        Zaloguj się
+                </button>*@
+                <br />
+                <button type="button" class="btn btn-success" @onclick="Authenticate">Zaloguj się</button>
+            </div>
+            </div>
+            
         </EditForm>
-    </div>
-</div>
+@*    </div>
+</div>*@
 
 
 @code {
     private class Model
     {
-        public string UserName { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public string UserName { get; set; }
+        public string Password { get; set; }
     }
 
     private Model model = new Model();
