@@ -7,60 +7,77 @@
     <option value="przychód"></option>
 </datalist>
 
-<h3>Dodaj nową transakcję</h3>
+
 
 <EditForm Model="model">
+    <div class="row justify-content-md-center">
+        <div class="col-4 border p-3 mb-2 bg-light text-dark text-center rounded">
+            <p class="fs-4 fw-bold">
+                Dodaj nową transakcję
+            </p>
+            
+            <div class="input-group mb-3">
+                <label class="input-group-text" >Nazwa transakcji</label>
+                <InputText class="form-control" id="nameTransaction" @bind-Value="model.name"/>  
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="input-group-text" >Opis</label>
+                <InputTextArea class="form-control" maxlength="250" @bind-Value="model.description"/>
+            </div>
     
-    <p>
-        Nazwa transakcji <InputText id="nameTransaction" @bind-Value="model.name"/>  
-    </p>
+            <div class="input-group mb-3">
+                <label class="input-group-text" >Kwota</label>
+                <InputNumber class="form-control" min="0.00" step="0.01" @bind-Value="model.amount" />
+                <span class="input-group-text">zł</span>
+            </div>
 
-    <p>
-        Opis (maksymalnie 250 znaków) <InputText maxlength="250" @bind-Value="model.description"/>
-    </p>
+            <div class="input-group mb-3">
+                <label class="input-group-text" >Data transakcji</label>
+                <InputText class="form-control" type="date" @bind-Value="model.date_transaction" />
+            </div>
     
-    <p>
-        Kwota <InputNumber min="0.00" step="0.01" @bind-Value="model.amount" />
-    </p>
-
-    <p>
-        Data transakcji <InputText type="date" @bind-Value="model.date_transaction" />
-    </p>
+            <div class="input-group mb-3">
+                <label class="input-group-text" >Typ</label>
+                <InputSelect class="form-select" @bind-Value="model.ListTransactions" >
+                    @foreach (var Transaction in Enum.GetValues(typeof(ListTransactions)))
+                    {
+                        <option value="@Transaction">@Transaction</option>
+                    }
+                </InputSelect>
+            </div>
     
-    <p>
-        Tyb 
-        <InputSelect @bind-Value="model.ListTransactions" >
-            @foreach (var Transaction in Enum.GetValues(typeof(ListTransactions)))
-            {
-                <option value="@Transaction">@Transaction</option>
-            }
-        </InputSelect>
-    </p>
+            <div class="input-group mb-3">
+                <label class="input-group-text" >Nazwa powiadomienia</label>
+                <InputText class="form-control" maxlength="40" @bind-Value="model.notification" />
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="input-group-text" >Treść powiadmienia</label>
+                <InputText class="form-control" maxlength="150" @bind-Value="model.title_notification" />
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="input-group-text" >Data powiadomienia</label>
+                <InputText class="form-control" type="date" @bind-Value="model.date_notification" />
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="input-group-text" >Godzina powiadomienia</label>
+                <InputText class="form-control" type="time" @bind-Value="model.time_notification" @bind-Value:format="HH:mm"/>
+            </div>
     
-    <p>
-        Nazwa powiadomienia <InputText maxlength="40" @bind-Value="model.notification" />
-    </p>
+            <!-- add file -->
+            <div class="input-group mb-3">
+                <InputFile class="form-control" />
+            </div>
 
-    <p>
-        Treść powiadmienia <InputText maxlength="150" @bind-Value="model.title_notification" />
-    </p>
+            <div>
+                <button type="button" class="btn btn-success" @onclick="model.aktualizacja">Dodaj transakcję</button>
+            </div>
 
-    <p>
-        Data powiadomienia <InputText type="date" @bind-Value="model.date_notification" />
-    </p>
-
-    <p>
-        Godzina powiadomienia <InputText type="time" @bind-Value="model.time_notification" @bind-Value:format="HH:mm"/>
-    </p>
-    
-    <!-- add file -->
-    <p>
-        <InputFile/>
-    </p>
-
-    <p>
-        <button @onclick="model.aktualizacja" >Dodaj transakcję</button>
-    </p>
+        </div>
+    </div>
 
             @model.nazwa
             @model.opis

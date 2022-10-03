@@ -1,5 +1,4 @@
-﻿@*@layout LoginLayout*@
-@page "/login"
+﻿@page "/login"
 @using AplikacjaInzynierska.Authentication
 @inject UserAccountService userAccountService
 @inject IJSRuntime js
@@ -7,26 +6,24 @@
 @inject NavigationManager navManager
 
 
-@*<div class="row justify-content-md-center">
-    <div class="col-1">*@
-        <EditForm Model="@model">
-            <div class="row justify-content-md-center">
-            <div class="col-3">
-                <div class="input-group">
-                Login <InputText class="form-control" @bind-Value="model.UserName" placeholder="Login" />
-            </div>
-            Hasło <InputText @bind-Value="model.Password" placeholder="Hasło" />
-        @*<button class="nav-link btn btn-link" @onclick="Authenticate">
-                        Zaloguj się
-                </button>*@
+<EditForm Model="@model">
+    <div class="row justify-content-md-center">
+        <div class="col-3 border p-3 mb-2 bg-light text-white rounded">
+                <InputText class="form-control" @bind-Value="model.UserName" placeholder="Login" />
                 <br />
-                <button type="button" class="btn btn-success" @onclick="Authenticate">Zaloguj się</button>
-            </div>
-            </div>
-            
-        </EditForm>
-@*    </div>
-</div>*@
+                <InputText type="password" class="form-control" @bind-Value="model.Password" placeholder="Hasło" />
+                <br />
+            <div class="row justify-content-around">
+                <div class="col-5">
+                    <button type="button" class="btn btn-success" @onclick="Authenticate">Zaloguj się</button>
+                </div>
+                <div class="col-5">
+                    <button type="button" class="btn btn-warning" @onclick="Authenticate">Utwórz konto</button>
+                </div>
+            </div>         
+        </div>
+    </div>
+</EditForm>
 
 
 @code {
@@ -43,7 +40,7 @@
         var userAccount = userAccountService.GetByUserName(model.UserName);
         if(userAccount == null || userAccount.Password != model.Password)
         {
-            await js.InvokeVoidAsync("alert", "Invalid User Name or Password");
+            await js.InvokeVoidAsync("alert", "Podano zły login lub hasło!");
             return;
         }
 
