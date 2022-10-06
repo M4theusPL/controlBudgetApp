@@ -1,31 +1,45 @@
 ﻿@page "/useraccount"
 
-<h3>Ustawienia konta</h3>
-
 <EditForm Model="model">
-    <p>
-        Imie: <InputText @bind-Value="model.name" />
-    </p>
+    <div class="row justify-content-md-center">
+        <div class="col-5 border p-3 mb-2 bg-light text-dark text-center rounded">
+            <p class="fs-4 fw-bold">
+                Ustawienia konta
+            </p>
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Imię</label>
+                <InputText class="form-control" maxlength="40" @bind-Value="model.name" />
+            </div>
 
-    <p>
-        Nazwisko: <InputText @bind-Value="model.surname" />
-    </p>
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Nazwisko</label>
+                <InputText class="form-control" maxlength="150" @bind-Value="model.surname" />
+            </div>
 
-    <p>
-        Data urodzenia:  <InputDate @bind-Value="model.birthday" />
-    </p>
+           <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Data powiadomienia</label>
+                <InputText class="form-control" type="date" @bind-Value="model.birthday" />
+            </div>
+
+            <!-- add file -->
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text">Zdjęcie profilowe</label>
+                <InputFile class="form-control" />
+            </div>
+
+             <button type="button" class="btn btn-success">Edytuj profil</button>
+        </div>
+    </div>
     
-    <p>
-        E-mail: <InputText @bind-Value="model.email" />
-    </p>
-
-    <p>
+    @*<p>
         <img src="images/user.jpg" zdjecie"/>
         <InputFile/>
     </p>
 
-    <button>Edytuj dane</button>
+    <button>Edytuj dane</button>*@
 </EditForm>
+
+
 
 <button>
     <NavLink href="passwordchange">
@@ -40,7 +54,7 @@
     {
         public string? name { get; set; } = "name";
         public string? surname { get; set; } = "surname";
-        public DateTime birthday { get; set; } = new DateTime (2005, 01, 01);
+        public string? birthday { get; set; } = "2005, 01, 01";
         public string? email { get; set; } = "email@email.com";
     }
 }

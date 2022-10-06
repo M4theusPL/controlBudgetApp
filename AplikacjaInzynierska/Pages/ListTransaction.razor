@@ -1,38 +1,51 @@
 ﻿@page "/listtransaction"
 @attribute [Authorize(Roles = "Administrator")]
 
-<h3>Lista transakcji</h3>
 
 @if (transactions == null)
 {
-    <p>Brak transakcji zapisanych.</p>
+    <div class="row justify-content-md-center text-center">
+        <p class="fs-4 fw-bold">Brak transakcji. Proszę dodać transakcje.</p>
+    </div>
 } 
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <td>ID</td>
-                <td>Nazwa</td>
-                <td>Opis</td>
-                <td>Kwota</td>
-                <td>Data transakcji</td>
-            </tr>
-        </thead>
+    <div class="row justify-content-md-center text-center">
+        <p class="fs-4 fw-bold">Lista transakcji</p>
+        <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
+                
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr class="fw-bold">
+                            <td>#</td>
+                            <td>Nazwa</td>
+                            <td>Opis</td>
+                            <td>Kwota</td>
+                            <td>Data transakcji</td>
+                            <td>Podgląd</td>
+                        </tr>
+                    </thead>
 
-        <tbody>
-            @foreach (var transaction in transactions)
-            {
-                <tr>
-                    <td>@transaction.id</td>
-                    <td>@transaction.name</td>
-                    <td>@transaction.description</td>
-                    <td>@transaction.amount</td>
-                    <td>@transaction.date_transaction</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    <tbody>
+                        @foreach (var transaction in transactions)
+                        {
+                            <tr>
+                                <td>@transaction.id</td>
+                                <td>@transaction.name</td>
+                                <td>@transaction.description</td>
+                                <td>@transaction.amount</td>
+                                <td>@transaction.date_transaction</td>
+                                <td>
+                                    <NavLink class="nav-link" href="/transaction">
+                                        <span class="material-icons" aria-hidden="true">search</span>
+                                    </NavLink>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+        </div>
+    </div>
 }
 
 @code {
@@ -40,7 +53,8 @@ else
     private List<Transaction> transactions = new()
     {
         new Transaction { id = 1, name = "test", description = "test test test", amount = 15.66, date_transaction = "08.08.2022" },
-        new Transaction { id = 2, name = "test2", description = "test2 test2 test2", amount = 19.99, date_transaction = "08.08.2022" }
+        new Transaction { id = 2, name = "test2", description = "test2 test2 test2", amount = 19.99, date_transaction = "08.08.2022" },
+        new Transaction { id = 3, name = "test3", description = "test3 test3 test3", amount = 15.94, date_transaction = "06.10.2022" }
     };
 
     private class Transaction

@@ -11,7 +11,8 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
+        <span class="top-row px-4"></span>
+        @*<div class="top-row px-4">
             
             <AuthorizeView>
                 <Authorized>
@@ -24,17 +25,18 @@
                     <NavLink class="nav-link" @onclick="Logout" href="javascript:void(0)">
                         <span class="oi oi-account-logout" aria-hidden="true"></span> Wyloguj się
                     </NavLink>
-                    @*<a @onclick="Logout" href="javascript:void(0)">Logout</a>*@
+                    <a @onclick="Logout" href="javascript:void(0)">Logout</a>
                 </Authorized>
                 <NotAuthorized>
                     <NavLink class="nav-link" href="/login">
-                        <span class="oi oi-account-login" aria-hidden="true"></span> Zaloguj się
+                        <span class="material-icons">login</span>
+                        @*<span class="oi oi-account-login" aria-hidden="true"></span>Zaloguj się
                     </NavLink>
                     
-                    @*<a href="/login">Login</a>*@
+                    <a href="/login">Login</a>
                 </NotAuthorized>
             </AuthorizeView>
-        </div>
+        </div>*@
 
         <article class="content px-4">
             @Body
