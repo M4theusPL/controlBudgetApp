@@ -16,7 +16,6 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                @*<span class="oi oi-home" aria-hidden="true"></span> Home*@
                 <span class="material-icons" aria-hidden="true">home</span> Strona Główna
             </NavLink>
         </div>
@@ -55,20 +54,18 @@
                     <NavLink class="nav-link" href="/groupsettings">
                         <span class="material-icons" aria-hidden="true">group</span> Moja grupa
                     </NavLink>
-                    <NavLink class="nav-link" href="/useraccount">
+                    <NavLink class="nav-link" href="/accountsettings">
                         <span class="material-icons" aria-hidden="true">person</span> Moje konto
                     </NavLink>
                     <NavLink class="nav-link" @onclick="Logout" href="javascript:void(0)">
                         <span class="material-icons" aria-hidden="true">logout</span> Wyloguj się
                     </NavLink>
                     </div>
-                @*<a @onclick="Logout" href="javascript:void(0)">Logout</a>*@
                 </Authorized>
             <NotAuthorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/login">
-                        <span class="material-icons">login</span>
-                    @*<span class="oi oi-account-login" aria-hidden="true"></span>*@Zaloguj się
+                        <span class="material-icons">login</span> Zaloguj się
                     </NavLink>
                 </div>
             </NotAuthorized>

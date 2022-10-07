@@ -1,4 +1,4 @@
-﻿@page "/useraccount"
+﻿@page "/accountsettings"
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -17,6 +17,26 @@
             </div>
 
            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Email</label>
+                <InputText class="form-control" maxlength="150" @bind-Value="model.email" />
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Stare hasło</label>
+                <InputText type="password" class="form-control" @bind-Value="model.password" />
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Nowe hasło</label>
+                <InputText type="password" class="form-control" @bind-Value="model.newpassword" />
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Powtórz nowe hasło</label>
+                <InputText type="password" class="form-control" @bind-Value="model.repeatpassword" />
+            </div>
+
+            <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Data powiadomienia</label>
                 <InputText class="form-control" type="date" @bind-Value="model.birthday" />
             </div>
@@ -27,7 +47,7 @@
                 <InputFile class="form-control" />
             </div>
 
-             <button type="button" class="btn btn-success">Edytuj profil</button>
+             <button type="button" class="btn btn-success">Zapisz</button>
         </div>
     </div>
     
@@ -39,14 +59,6 @@
     <button>Edytuj dane</button>*@
 </EditForm>
 
-
-
-<button>
-    <NavLink href="passwordchange">
-        Zmień hasło
-    </NavLink>
-</button>
-
 @code {
     Model model = new Model();
 
@@ -56,5 +68,8 @@
         public string? surname { get; set; } = "surname";
         public string? birthday { get; set; } = "2005, 01, 01";
         public string? email { get; set; } = "email@email.com";
+        public string? password { get; set; }
+        public string? newpassword { get; set; }
+        public string? repeatpassword { get; set; }
     }
 }
