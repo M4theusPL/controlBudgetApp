@@ -8,7 +8,7 @@
 
 <EditForm Model="@model">
     <div class="row justify-content-md-center">
-        <div class="col-3 border p-3 mb-2 bg-light text-white rounded">
+        <div class="col-sm-9 col-md-9 col-lg-6 col-xl-4 border p-3 mb-2 bg-light text-white rounded">
                 <InputText class="form-control" @bind-Value="model.UserName" placeholder="Login" />
                 <br />
                 <InputText type="password" class="form-control" @bind-Value="model.Password" placeholder="Hasło" />
@@ -18,8 +18,11 @@
                     <button type="button" class="btn btn-success" @onclick="Authenticate">Zaloguj się</button>
                 </div>
                 <div class="col-5">
-                    <button type="button" class="btn btn-warning" @onclick="Authenticate">Utwórz konto</button>
+                    <NavLink href="/accountregistration">
+                        <button type="button" class="btn btn-warning">Utwórz konto</button>
+                    </NavLink>
                 </div>
+                
             </div>         
         </div>
     </div>

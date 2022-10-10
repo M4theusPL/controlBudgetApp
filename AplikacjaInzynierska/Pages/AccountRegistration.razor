@@ -1,10 +1,10 @@
-﻿@page "/accountsettings"
+﻿@page "/accountregistration"
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
         <div class="col-5 border p-3 mb-2 bg-light text-dark text-center rounded">
             <p class="fs-4 fw-bold">
-                Ustawienia konta
+                Rejestracja konta
             </p>
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Imię</label>
@@ -22,17 +22,12 @@
             </div>
 
             <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Stare hasło</label>
+                <label class="col-sm-5 input-group-text" >Hasło</label>
                 <InputText type="password" class="form-control" @bind-Value="model.password" />
             </div>
 
             <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Nowe hasło</label>
-                <InputText type="password" class="form-control" @bind-Value="model.newpassword" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Powtórz nowe hasło</label>
+                <label class="col-sm-5 input-group-text" >Powtórz hasło</label>
                 <InputText type="password" class="form-control" @bind-Value="model.repeatpassword" />
             </div>
 
@@ -41,25 +36,14 @@
                 <InputText class="form-control" type="date" @bind-Value="model.birthday" />
             </div>
 
-            <!-- add file -->
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text">Zdjęcie profilowe</label>
-                <InputFile class="form-control" />
-            </div>
-
-             <button type="button" class="btn btn-success">Zapisz</button>
+             <button type="button" class="btn btn-success">Utwórz konto</button>
         </div>
     </div>
-    
-    @*<p>
-        <img src="images/user.jpg" zdjecie"/>
-        <InputFile/>
-    </p>
 
-    <button>Edytuj dane</button>*@
 </EditForm>
 
 @code {
+
     Model model = new Model();
 
     class Model
@@ -69,7 +53,8 @@
         public string? birthday { get; set; } = "2005, 01, 01";
         public string? email { get; set; } = "email@email.com";
         public string? password { get; set; }
-        public string? newpassword { get; set; }
         public string? repeatpassword { get; set; }
     }
+
+
 }

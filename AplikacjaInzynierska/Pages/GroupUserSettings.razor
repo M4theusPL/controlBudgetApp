@@ -1,0 +1,61 @@
+﻿@page "/groupusersettings"
+
+<EditForm Model="model">
+    <div class="row justify-content-md-center">
+        <div class="col-5 border p-3 mb-2 bg-light text-dark text-center rounded">
+            <p class="fs-4 fw-bold">
+                Ustawienia użytkownika: (email)
+            </p>
+
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Imię</label>
+                <InputText class="form-control" @bind-Value="model.name"/>
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Nazwisko</label>
+                <InputText class="form-control" maxlength="250" @bind-Value="model.surname"/>
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Email</label>
+                <InputText class="form-control" @bind-Value="model.email" />
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Typ</label>
+                <InputSelect class="form-select" @bind-Value="model.PermissionList" >
+                    @foreach (var Permission in Enum.GetValues(typeof(PermissionList)))
+                    {
+                        <option value="@Permission">@Permission</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div>
+                <button type="button" class="btn btn-success">Aktualizacja użytkownika</button>
+            </div>
+
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+        Model model = new Model();
+
+        class Model
+        {
+            public PermissionList PermissionList { get; set; }
+            public string? name { get; set; }
+            public string? surname { get; set; }
+            public string? email { get; set; }
+        }
+
+        enum PermissionList
+        {
+            Administrator,
+            Użytkownik
+        }
+
+}
