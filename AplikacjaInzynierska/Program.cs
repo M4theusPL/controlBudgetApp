@@ -1,20 +1,17 @@
 using AplikacjaInzynierska.Authentication;
 using AplikacjaInzynierska.Data;
-using AplikacjaInzynierska.Pages;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
+using AplikacjaInzynierska.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("Myconnection");
 
 // Add services to the container.
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseNpgsql(Configuration.GetConnectionString("Myconnection"));
-});
+builder.Services.AddDbContext<ApplicationDbContext>(options => 
+    options.UseNpgsql(connectionString));
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -22,6 +19,7 @@ builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddSingleton<UserAccountService>();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddScoped<GroupUserService>();
 
 var app = builder.Build();
 

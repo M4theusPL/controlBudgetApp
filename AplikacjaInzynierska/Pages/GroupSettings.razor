@@ -1,6 +1,10 @@
 ﻿@page "/groupsettings"
 
-@if (users == null)
+@using AplikacjaInzynierska.Data;
+@using AplikacjaInzynierska.Services;
+@inherits OwningComponentBase<GroupUserService>
+
+@if (sc == null)
 {
     <EditForm Model="model">
         <div class="row justify-content-md-center">
@@ -35,12 +39,12 @@ else
                         </thead>
 
                         <tbody>
-                    @foreach (var users in users)
+                    @foreach (var item in sc)
                     {
                                     <tr>
-                                        <td>@users.id</td>
-                                        <td>@users.name</td>
-                                        <td>@users.surname</td>
+                                        <td>@item.email</td>
+                                        <td>@item.name</td>
+                                        <td>@item.surname</td>
                                         <td>
                                             <NavLink class="nav-link" href="/groupusersettings">
                                                 <span class="material-icons" aria-hidden="true">search</span>
@@ -81,19 +85,26 @@ else
     }
 
 
-    private List<User> users = new()
-    {
-        new User { id = 1, name = "Jan", surname = "Kowalski" },
-        new User { id = 2, name = "Janina", surname = "Kowalska" },
-        new User { id = 3, name = "Stanisław", surname = "Kowalski" }
-    };
+    //private List<User> users = new()
+    //{
+    //    new User { id = 1, name = "Jan", surname = "Kowalski" },
+    //    new User { id = 2, name = "Janina", surname = "Kowalska" },
+    //    new User { id = 3, name = "Stanisław", surname = "Kowalski" }
+    //};
 
-    private class User
-    {
-        public int id { get; set; }
-        public string? name { get; set; }
-        public string? surname { get; set; }
+    //private class User
+    //{
+    //    public int id { get; set; }
+    //    public string? name { get; set; }
+    //    public string? surname { get; set; }
 
+    //}
+
+    public System.Collections.Generic.IList<GroupUserClass> sc;
+
+    protected override void OnInitialized()
+    {
+        sc = Service.displayuser();
     }
 
 }
