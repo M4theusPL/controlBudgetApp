@@ -1,6 +1,7 @@
 ﻿@page "/login"
 @using AplikacjaInzynierska.Authentication
-@inject UserAccountService userAccountService
+@using AplikacjaInzynierska.Services
+@inject GroupUserService groupUserService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
@@ -9,9 +10,9 @@
 <EditForm Model="@model">
     <div class="row justify-content-md-center">
         <div class="col-sm-9 col-md-9 col-lg-6 col-xl-4 border p-3 mb-2 bg-light text-white rounded">
-                <InputText class="form-control" @bind-Value="model.UserName" placeholder="Login" />
+                <InputText class="form-control" @bind-Value="model.email" placeholder="Email" />
                 <br />
-                <InputText type="password" class="form-control" @bind-Value="model.Password" placeholder="Hasło" />
+                <InputText type="password" class="form-control" @bind-Value="model.password" placeholder="Hasło" />
                 <br />
             <div class="row justify-content-around">
                 <div class="col-5">
@@ -32,16 +33,17 @@
 @code {
     private class Model
     {
-        public string UserName { get; set; }
-        public string Password { get; set; }
+        public string email { get; set; }
+        public string password { get; set; }
     }
 
     private Model model = new Model();
 
     private async Task Authenticate()
     {
-        var userAccount = userAccountService.GetByUserName(model.UserName);
-        if(userAccount == null || userAccount.Password != model.Password)
+        //var userAccount = userAccountService.GetByUserName(model.UserName);
+        var userAccount = groupUserService.GetByUserName(model.email);
+        if (userAccount == null || userAccount.password != model.password)
         {
             await js.InvokeVoidAsync("alert", "Podano zły login lub hasło!");
             return;
@@ -50,8 +52,8 @@
         var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
         await customAuthStateProvider.UpdateAuthenticationState(new UserSession
             {
-                UserName = userAccount.UserName,
-                Role = userAccount.Role
+                UserName = userAccount.name,
+                admin_group = userAccount.admin_group
             });
             navManager.NavigateTo("/", true);
     }

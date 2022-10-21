@@ -10,5 +10,6 @@ namespace AplikacjaInzynierska.Data
         }
 
         public DbSet<GroupUserClass> users { get; set; }
+
     }
 }

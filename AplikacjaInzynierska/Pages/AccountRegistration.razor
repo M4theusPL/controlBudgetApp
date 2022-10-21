@@ -1,4 +1,10 @@
 ﻿@page "/accountregistration"
+@using AplikacjaInzynierska.Authentication
+@using AplikacjaInzynierska.Services
+@inject GroupUserService groupUserService
+@inject IJSRuntime js
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navManager
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -33,7 +39,7 @@
 
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Data urodzenia</label>
-                <InputText class="form-control" type="date" @bind-Value="model.birthday" />
+                <InputText class="form-control" type="date" @bind-Value="model.date_birthday" />
             </div>
 
              <button type="button" class="btn btn-success">Utwórz konto</button>
@@ -50,11 +56,25 @@
     {
         public string? name { get; set; } = "name";
         public string? surname { get; set; } = "surname";
-        public string? birthday { get; set; } = "2005, 01, 01";
+        public string? date_birthday { get; set; } = "2005, 01, 01";
         public string? email { get; set; } = "email@email.com";
         public string? password { get; set; }
         public string? repeatpassword { get; set; }
     }
 
+    private async Task Authenticate()
+    {
+        //var userAccount = userAccountService.GetByUserName(model.UserName);
+        //var userAccount = groupUserService.AddnewUser(model.name, model.surname, model.email, model.password, model.date_birthday);
+        //if (userAccount == null || userAccount.password != model.password)
+        //{
+        //    await js.InvokeVoidAsync("alert", "User istnieje");
+        //    return;
+        //}
+
+        Service.AddnewUser(model.name, model.surname, model.email, model.password, model.date_birthday);
+    }
+
+    
 
 }
