@@ -1,12 +1,14 @@
 ﻿@page "/accountregistration"
 @using AplikacjaInzynierska.Authentication
 @using AplikacjaInzynierska.Services
+@using AplikacjaInzynierska.Data
 @inject GroupUserService groupUserService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
+@inherits OwningComponentBase<GroupUserService>
 
-<EditForm Model="model">
+<EditForm Model="model" >
     <div class="row justify-content-md-center">
         <div class="col-5 border p-3 mb-2 bg-light text-dark text-center rounded">
             <p class="fs-4 fw-bold">
@@ -39,10 +41,10 @@
 
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Data urodzenia</label>
-                <InputText class="form-control" type="date" @bind-Value="model.date_birthday" />
+                <InputDate class="form-control" @bind-Value="model.date_birthday" />
             </div>
 
-             <button type="button" class="btn btn-success">Utwórz konto</button>
+             <button type="button" class="btn btn-success" @onclick="Authenticate">Utwórz konto</button>
         </div>
     </div>
 
@@ -54,27 +56,61 @@
 
     class Model
     {
-        public string? name { get; set; } = "name";
-        public string? surname { get; set; } = "surname";
-        public string? date_birthday { get; set; } = "2005, 01, 01";
-        public string? email { get; set; } = "email@email.com";
+        public string? name { get; set; }
+        public string? surname { get; set; }
+        public DateTime date_birthday { get; set; } = DateTime.Now.ToUniversalTime();
+        public string? email { get; set; }
         public string? password { get; set; }
         public string? repeatpassword { get; set; }
     }
 
-    private async Task Authenticate()
+    //async Task Authenticate()
+    //{
+    //    //var userAccount = userAccountService.GetByUserName(model.UserName);
+    //    //var userAccount = groupUserService.AddnewUser(model.name, model.surname, model.email, model.password, model.date_birthday);
+    //    //if (userAccount == null || userAccount.password != model.password)
+    //    //{
+    //    //    await js.InvokeVoidAsync("alert", "User istnieje");
+    //    //    return;
+    //    //}
+
+    //    //Service.AddnewUser(model.name, model.surname, model.email, model.password, model.date_birthday);
+    //    await GroupUserService.AddNewUser(model);
+    //}
+
+    GroupUserClass gu = new GroupUserClass();
+
+
+    void Authenticate()
     {
-        //var userAccount = userAccountService.GetByUserName(model.UserName);
-        //var userAccount = groupUserService.AddnewUser(model.name, model.surname, model.email, model.password, model.date_birthday);
-        //if (userAccount == null || userAccount.password != model.password)
-        //{
-        //    await js.InvokeVoidAsync("alert", "User istnieje");
-        //    return;
-        //}
-
-        Service.AddnewUser(model.name, model.surname, model.email, model.password, model.date_birthday);
+        if (model.password == model.repeatpassword)
+        {
+            var userAccount = groupUserService.GetByUserName(model.email);
+            if (userAccount == null)
+            {
+                gu.id_user = 0;
+                gu.id_group = 0;
+                gu.admin_group = "Admin";
+                gu.name = model.name;
+                gu.surname = model.surname;
+                gu.date_birthday = model.date_birthday.ToUniversalTime();
+                gu.email = model.email;
+                gu.password = model.password;
+                Service.AddNewUser(gu);
+                navManager.NavigateTo("/accountcreatedsuccessfully", true);
+            }
+            else
+            {
+                js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
+            }
+        }
+        else 
+        {
+            js.InvokeVoidAsync("alert", "Hasła się nie zgadzają!");
+            model.password = "";
+            model.repeatpassword = "";
+            return;
+        }
     }
-
-    
 
 }

@@ -22,31 +22,17 @@ namespace AplikacjaInzynierska.Services
             return _dbcontext.users.FirstOrDefault(x => x.email == email);
         }
 
-        //public GroupUserClass? SearchAddNewUser(string name, string surname, string email, string password, string date_birthday)
+        //public TaskddNewUser(GroupUserClass newUser)
         //{
-        //    Console.WriteLine("My debug output.");
-
-        //    var newUser = new GroupUserClass();
-        //        {
-        //            newUser.admin_group = "Admin";
-        //            newUser.name = name;
-        //            newUser.surname = surname;
-        //            newUser.date_birthday = date_birthday;
-        //            newUser.email = email;
-        //            newUser.password = password;
-        //        };
-
-        //        _dbcontext.GroupUserClass.Add(newUser);
-        //        _dbcontext.SaveChanges();
-
-        //    return Ok;
+        //    _dbcontext.users.Add(newUser);
+        //    _dbcontext.SaveChanges();
+        //    return true;
         //}
-
-        public GroupUserClass AddnewUser(GroupUserClass gu)
+        public bool AddNewUser(GroupUserClass gc)
         {
-            _dbcontext.Database.ExecuteSqlRaw("DEFUALT", 0, gu.admin_group, gu.name, gu.surname, gu.date_birthday, gu.email, gu.password);
+            _dbcontext.users.Add(gc);
             _dbcontext.SaveChanges();
-            return gu;
+            return true;
         }
 
 

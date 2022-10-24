@@ -23,7 +23,7 @@
                         <button type="button" class="btn btn-warning">Utwórz konto</button>
                     </NavLink>
                 </div>
-                
+
             </div>         
         </div>
     </div>
@@ -39,10 +39,11 @@
 
     private Model model = new Model();
 
+    //private async Task Authenticate()
     private async Task Authenticate()
     {
-        //var userAccount = userAccountService.GetByUserName(model.UserName);
         var userAccount = groupUserService.GetByUserName(model.email);
+        
         if (userAccount == null || userAccount.password != model.password)
         {
             await js.InvokeVoidAsync("alert", "Podano zły login lub hasło!");
@@ -55,6 +56,6 @@
                 UserName = userAccount.name,
                 admin_group = userAccount.admin_group
             });
-            navManager.NavigateTo("/", true);
+        navManager.NavigateTo("/", true);
     }
 }
