@@ -42,7 +42,7 @@
     //private async Task Authenticate()
     private async Task Authenticate()
     {
-        var userAccount = groupUserService.GetByUserName(model.email);
+        var userAccount = groupUserService.GetByUserEmail(model.email);
         
         if (userAccount == null || userAccount.password != model.password)
         {
@@ -54,6 +54,7 @@
         await customAuthStateProvider.UpdateAuthenticationState(new UserSession
             {
                 UserName = userAccount.name,
+                id_user = userAccount.id_user,
                 admin_group = userAccount.admin_group
             });
         navManager.NavigateTo("/", true);

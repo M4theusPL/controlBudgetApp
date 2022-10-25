@@ -85,7 +85,7 @@
     {
         if (model.password == model.repeatpassword)
         {
-            var userAccount = groupUserService.GetByUserName(model.email);
+            var userAccount = groupUserService.GetByUserEmail(model.email);
             if (userAccount == null)
             {
                 gu.id_user = 0;

@@ -1,8 +1,11 @@
 ﻿@page "/listtransaction"
+@using AplikacjaInzynierska.Data;
+@using AplikacjaInzynierska.Services;
+@inject TransactionService transactionService
+@inherits OwningComponentBase<TransactionService>
 @attribute [Authorize(Roles = "Admin")]
 
-
-@if (transactions == null)
+@if (trans == null)
 {
     <div class="row justify-content-md-center text-center">
         <p class="fs-4 fw-bold">Brak transakcji. Proszę dodać transakcje.</p>
@@ -27,14 +30,14 @@ else
                     </thead>
 
                     <tbody>
-                        @foreach (var transaction in transactions)
+                    @foreach (var trans in trans)
                         {
                             <tr>
-                                <td>@transaction.id</td>
-                                <td>@transaction.name</td>
-                                <td>@transaction.description</td>
-                                <td>@transaction.amount</td>
-                                <td>@transaction.date_transaction</td>
+                                <td>@trans.id_user_transaction</td>
+                                <td>@trans.name_transaction</td>
+                                <td>@trans.description</td>
+                                <td>@trans.amount</td>
+                                <td>@trans.date_transaction</td>
                                 <td>
                                     <NavLink class="nav-link" href="/transaction">
                                         <span class="material-icons" aria-hidden="true">search</span>
@@ -50,12 +53,12 @@ else
 
 @code {
 
-    private List<Transaction> transactions = new()
-    {
-        new Transaction { id = 1, name = "test", description = "test test test", amount = 15.66, date_transaction = "08.08.2022" },
-        new Transaction { id = 2, name = "test2", description = "test2 test2 test2", amount = 19.99, date_transaction = "08.08.2022" },
-        new Transaction { id = 3, name = "test3", description = "test3 test3 test3", amount = 15.94, date_transaction = "06.10.2022" }
-    };
+    //private List<Transaction> transactions = new()
+    //{
+    //    new Transaction { id = 1, name = "test", description = "test test test", amount = 15.66, date_transaction = "08.08.2022" },
+    //    new Transaction { id = 2, name = "test2", description = "test2 test2 test2", amount = 19.99, date_transaction = "08.08.2022" },
+    //    new Transaction { id = 3, name = "test3", description = "test3 test3 test3", amount = 15.94, date_transaction = "06.10.2022" }
+    //};
 
     private class Transaction
     {
@@ -67,4 +70,21 @@ else
 
     }
 
+    public System.Collections.Generic.IList<TransactionsClass> trans;
+
+    protected override void OnInitialized()
+    {
+        var userTransactions = transactionService.GetByTransaction(1);
+
+        if (userTransactions == null)
+        {
+
+            trans = null;
+        }
+        else
+        {
+            trans = Service.displaytransactions();
+        }
+        
+    }
 }

@@ -17,24 +17,22 @@ namespace AplikacjaInzynierska.Services
         {
             return _dbcontext.users.ToList();
         }
-        public GroupUserClass? GetByUserName(string email)
+
+        public GroupUserClass? GetByUserEmail(string email)
         {
             return _dbcontext.users.FirstOrDefault(x => x.email == email);
         }
 
-        //public TaskddNewUser(GroupUserClass newUser)
-        //{
-        //    _dbcontext.users.Add(newUser);
-        //    _dbcontext.SaveChanges();
-        //    return true;
-        //}
+        public GroupUserClass? GetByUserIdGroup(int id_group)
+        {
+            return _dbcontext.users.FirstOrDefault(x => x.id_group == id_group);
+        }
+
         public bool AddNewUser(GroupUserClass gc)
         {
             _dbcontext.users.Add(gc);
             _dbcontext.SaveChanges();
             return true;
         }
-
-
     }
 }

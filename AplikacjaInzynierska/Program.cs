@@ -19,6 +19,8 @@ builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<GroupUserService>();
+builder.Services.AddScoped<TransactionService>();
+
 
 var app = builder.Build();
 
