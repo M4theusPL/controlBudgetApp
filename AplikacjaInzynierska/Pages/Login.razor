@@ -1,11 +1,12 @@
 ﻿@page "/login"
 @using AplikacjaInzynierska.Authentication
 @using AplikacjaInzynierska.Services
+@using AplikacjaInzynierska.Data
 @inject GroupUserService groupUserService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
-
+@inject Blazored.SessionStorage.ISessionStorageService session
 
 <EditForm Model="@model">
     <div class="row justify-content-md-center">
@@ -39,22 +40,26 @@
 
     private Model model = new Model();
 
-    //private async Task Authenticate()
     private async Task Authenticate()
     {
         var userAccount = groupUserService.GetByUserEmail(model.email);
-        
+
         if (userAccount == null || userAccount.password != model.password)
         {
             await js.InvokeVoidAsync("alert", "Podano zły login lub hasło!");
             return;
         }
 
+        var userInfo = new UserInformation();
+        userInfo.id_user = userAccount.id_user;
+        userInfo.email = userAccount.email;
+        session.SetItemAsync("UserInfo", userInfo);
+
         var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
         await customAuthStateProvider.UpdateAuthenticationState(new UserSession
             {
                 UserName = userAccount.name,
-                id_user = userAccount.id_user,
+                email = userAccount.email,
                 admin_group = userAccount.admin_group
             });
         navManager.NavigateTo("/", true);

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 using AplikacjaInzynierska.Services;
+using Blazored.SessionStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Myconnection");
@@ -20,7 +21,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStat
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<GroupUserService>();
 builder.Services.AddScoped<TransactionService>();
-
+builder.Services.AddBlazoredSessionStorage();
 
 var app = builder.Build();
 

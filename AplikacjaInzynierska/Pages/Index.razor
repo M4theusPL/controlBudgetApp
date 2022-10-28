@@ -29,13 +29,13 @@
 
 
 @code{
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationState { get; set; }
+    //[CascadingParameter]
+    //private Task<AuthenticationState> authenticationState { get; set; }
 
-    private async Task DisplayGreetingAlert()
-    {
-        var authState = await authenticationState;
-        var message = $"Hello {authState.User.Identity.Name}";
-        await js.InvokeVoidAsync("alert", message);
-    }
+    //private async Task DisplayGreetingAlert()
+    //{
+    //    var authState = await authenticationState;
+    //    var message = $"Hello {authState.User.Identity.Name}";
+    //    await js.InvokeVoidAsync("alert", message);
+    //}
 }

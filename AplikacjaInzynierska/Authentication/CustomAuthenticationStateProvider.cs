@@ -28,7 +28,8 @@ namespace AplikacjaInzynierska.Authentication
                 var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, userSession.UserName),
-                    new Claim(ClaimTypes.Role, userSession.admin_group)
+                    new Claim(ClaimTypes.Role, userSession.admin_group),
+                    new Claim(ClaimTypes.Email, userSession.email)
                 }, "CustomAuth"));
                 return await Task.FromResult(new AuthenticationState(claimsPrincipal));
             }
@@ -49,7 +50,8 @@ namespace AplikacjaInzynierska.Authentication
                 claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, userSession.UserName),
-                    new Claim(ClaimTypes.Role, userSession.admin_group)
+                    new Claim(ClaimTypes.Role, userSession.admin_group),
+                    new Claim(ClaimTypes.Email, userSession.email)
                 }));
             }
             else

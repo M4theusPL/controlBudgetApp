@@ -1,4 +1,13 @@
 ﻿@page "/accountsettings"
+@using AplikacjaInzynierska.Authentication
+@using AplikacjaInzynierska.Services
+@using AplikacjaInzynierska.Data
+@inject GroupUserService groupUserService
+@inject IJSRuntime js
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navManager
+@inherits OwningComponentBase<GroupUserService>
+@inject Blazored.SessionStorage.ISessionStorageService session
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -8,7 +17,7 @@
             </p>
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Imię</label>
-                <InputText class="form-control" maxlength="40" @bind-Value="model.name" />
+                    <InputText class="form-control" maxlength="40" @bind-Value="model.name" />
             </div>
 
             <div class="input-group mb-3">
@@ -38,7 +47,7 @@
 
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Data urodzenia</label>
-                <InputText class="form-control" type="date" @bind-Value="model.birthday" />
+                <InputDate class="form-control" @bind-Value="model.date_birthday" />
             </div>
 
             <!-- add file -->
@@ -47,7 +56,7 @@
                 <InputFile class="form-control" />
             </div>
 
-             <button type="button" class="btn btn-success">Zapisz</button>
+             <button type="button" class="btn btn-success" @onclick="Authenticate">Zapisz</button>
         </div>
     </div>
     
@@ -60,16 +69,114 @@
 </EditForm>
 
 @code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    //private async Task DisplayGreetingAlert()
+    //{
+    //    var authState = await authenticationState;
+    //    var message = $"Hello {authState.User.Identity.Name}";
+    //    await js.InvokeVoidAsync("alert", message);
+    //}
+
     Model model = new Model();
 
     class Model
     {
-        public string? name { get; set; } = "name";
-        public string? surname { get; set; } = "surname";
-        public string? birthday { get; set; } = "2005, 01, 01";
-        public string? email { get; set; } = "email@email.com";
-        public string? password { get; set; }
-        public string? newpassword { get; set; }
-        public string? repeatpassword { get; set; }
+        public string? name { get; set; }
+        public string? surname { get; set; }
+        public DateTime date_birthday { get; set; }
+        public string? email { get; set; }
+        public string? password { get; set; } = "";
+        public string? newpassword { get; set; } = "";
+        public string? repeatpassword { get; set; } = "";
     }
+
+
+    public UserInformation userInfo;
+
+    public System.Collections.Generic.IList<GroupUserClass> userr;
+
+    protected override async Task OnInitializedAsync()
+    {
+        userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
+        var emaill = userInfo.email;
+        //var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        //var authState = await customAuthStateProvider.GetAuthenticationStateAsync();
+        var userInformation = groupUserService.GetByUserEmail(emaill);
+
+        //model.name = authState.FirstOrDefault(ClaimTypes.Email).Value;
+        model.name = userInformation.name;
+        model.surname = userInformation.surname;
+        model.email = userInformation.email;
+        model.date_birthday = userInformation.date_birthday;
+    }
+
+    void Authenticate()
+    {
+        var userAccount = groupUserService.GetByUserEmail(model.email);
+        
+            if (userAccount == null)
+            {
+                js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
+            }
+            else
+            {
+                if (model.password == "")
+                {
+                    GroupUserClass gu = new GroupUserClass();
+
+                    gu.name = model.name;
+                    gu.surname = model.surname;
+                    gu.date_birthday = model.date_birthday;
+                    gu.email = model.email;
+                    string newpassword = null;
+
+                    Service.EditUser(gu, newpassword);
+                    js.InvokeVoidAsync("alert", "Pomyślny update!");
+                }
+                else
+                {
+                    if (model.password == userAccount.password)
+                    {
+                        if ((model.newpassword != "") && (model.newpassword == model.repeatpassword))
+                        {
+                            GroupUserClass gu = new GroupUserClass();
+
+                            gu.name = model.name;
+                            gu.surname = model.surname;
+                        gu.date_birthday = model.date_birthday.ToUniversalTime();
+                            gu.email = model.email;
+                            gu.password = model.password;
+                            string newpassword = model.newpassword;
+
+                            Service.EditUser(gu, newpassword);
+                            model.password = "";
+                            model.newpassword = "";
+                            model.repeatpassword = "";
+                            js.InvokeVoidAsync("alert", "Pomyślny update z hasłem!");
+                        }
+                        else
+                        {
+                            js.InvokeVoidAsync("alert", "Nowe hasła nie są takie same!");
+                            model.password = "";
+                            model.newpassword = "";
+                            model.repeatpassword = "";
+                        }
+                        
+                    }
+                    else
+                    {
+                        js.InvokeVoidAsync("alert", "Stare hasło podano nieprawidłowe!");
+                        model.password = "";
+                        model.newpassword = "";
+                        model.repeatpassword = "";
+                    }
+                }
+        }
+        
+    }
+
+   
 }
