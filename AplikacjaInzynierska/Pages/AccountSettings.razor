@@ -70,16 +70,6 @@
 
 @code {
 
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationState { get; set; }
-
-    //private async Task DisplayGreetingAlert()
-    //{
-    //    var authState = await authenticationState;
-    //    var message = $"Hello {authState.User.Identity.Name}";
-    //    await js.InvokeVoidAsync("alert", message);
-    //}
-
     Model model = new Model();
 
     class Model
@@ -101,12 +91,10 @@
     protected override async Task OnInitializedAsync()
     {
         userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
-        var emaill = userInfo.email;
-        //var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
-        //var authState = await customAuthStateProvider.GetAuthenticationStateAsync();
-        var userInformation = groupUserService.GetByUserEmail(emaill);
+        var email = userInfo.email;
 
-        //model.name = authState.FirstOrDefault(ClaimTypes.Email).Value;
+        var userInformation = groupUserService.GetByUserEmail(email);
+
         model.name = userInformation.name;
         model.surname = userInformation.surname;
         model.email = userInformation.email;
@@ -178,5 +166,4 @@
         
     }
 
-   
 }

@@ -3,6 +3,7 @@
 @using AplikacjaInzynierska.Services;
 @inject GroupUserService groupUserService
 @inherits OwningComponentBase<GroupUserService>
+@inject Blazored.SessionStorage.ISessionStorageService session
 
 @if (sc == null)
 {
@@ -13,7 +14,7 @@
                     Tworzenie grupy
                 </p>
                 <div class="input-group mb-3">
-                    <label class="col-sm-5 input-group-text" >Imię</label>
+                    <label class="col-sm-5 input-group-text" >Nazwa grupy</label>
                     <InputText class="form-control" maxlength="40" @bind-Value="model.groupname" />
                 </div>
 
@@ -31,7 +32,7 @@ else
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr class="fw-bold">
-                                <td>#</td>
+                                <td>Email</td>
                                 <td>Imię</td>
                                 <td>Nazwisko</td>
                                 <td>Podgląd</td>
@@ -84,14 +85,27 @@ else
         public string? email { get; set; }
     }
 
+    public UserInformation userInfo;
     public System.Collections.Generic.IList<GroupUserClass> sc;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        sc = Service.displayuser();
+        userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
+        var email = userInfo.email;
 
-        var userIdGroup = groupUserService.GetByUserIdGroup(0);
-            sc = Service.displayuser();
+        var userInformation = groupUserService.GetByUserEmail(email);
+        var id_group = userInformation.id_group;
+
+
+        if (id_group == 0)
+        {
+            sc = null;
+        }
+        else
+        {
+            sc = Service.displayUsersGroup(id_group);
+            //sc = Service.displayuser();
+        }
     }
 
 }

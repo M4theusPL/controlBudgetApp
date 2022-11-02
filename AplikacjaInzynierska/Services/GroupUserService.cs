@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.Arm;
+using System.Security.Cryptography;
 
 namespace AplikacjaInzynierska.Services
 {
@@ -18,6 +19,11 @@ namespace AplikacjaInzynierska.Services
         public List<GroupUserClass> displayuser()
         {
             return _dbcontext.users.ToList();
+        }
+        
+        public List<GroupUserClass> displayUsersGroup(int Id)
+        {
+            return _dbcontext.users.Where(x => x.id_group == Id).ToList();
         }
 
         public GroupUserClass? GetByUserEmail(string email)
@@ -78,6 +84,11 @@ namespace AplikacjaInzynierska.Services
                 return false;
             }
            
+        }
+
+        public GroupUserClass? GetByIdGroup(int id_group)
+        {
+            return _dbcontext.users.FirstOrDefault(x => x.id_group == id_group);
         }
     }
 }

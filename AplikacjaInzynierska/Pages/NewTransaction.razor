@@ -1,5 +1,14 @@
 ﻿@page "/newtransaction"
+@using AplikacjaInzynierska.Authentication
+@using AplikacjaInzynierska.Services
+@using AplikacjaInzynierska.Data
 @attribute [Authorize(Roles = "Admin, User")]
+@inject TransactionService transactionService
+@inject IJSRuntime js
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navManager
+@inherits OwningComponentBase<TransactionService>
+@inject Blazored.SessionStorage.ISessionStorageService session
 
 <datalist id="type_transaction">
     <option value="wydatek"></option>
@@ -18,7 +27,7 @@
             
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Nazwa transakcji</label>
-                <InputText class="form-control" id="nameTransaction" @bind-Value="model.name"/>
+                <InputText class="form-control" @bind-Value="model.name_transaction"/>
             </div>
 
             <div class="input-group mb-3">
@@ -34,7 +43,7 @@
 
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Data transakcji</label>
-                <InputText class="form-control" type="date" @bind-Value="model.date_transaction" />
+                <InputDate class="form-control" @bind-Value="model.date_transaction" />
             </div>
     
             <div class="input-group mb-3">
@@ -49,22 +58,22 @@
     
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Nazwa powiadomienia</label>
-                <InputText class="form-control" maxlength="40" @bind-Value="model.notification" />
+                <InputText class="form-control" maxlength="40" @bind-Value="model.name_notification" />
             </div>
 
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Treść powiadmienia</label>
-                <InputText class="form-control" maxlength="150" @bind-Value="model.title_notification" />
+                <InputText class="form-control" maxlength="150" @bind-Value="model.description_notification" />
             </div>
 
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Data powiadomienia</label>
-                <InputText class="form-control" type="date" @bind-Value="model.date_notification" />
+                <InputDate class="form-control" @bind-Value="model.date_notification" />
             </div>
 
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Godzina powiadomienia</label>
-                <InputText class="form-control" type="time" @bind-Value="model.time_notification" @bind-Value:format="HH:mm"/>
+                <input class="form-control" type="time" @bind="model.time_notification" />
             </div>
     
             <!-- add file -->
@@ -74,21 +83,11 @@
             </div>
 
             <div>
-                <button type="button" class="btn btn-success" @onclick="model.aktualizacja">Dodaj transakcję</button>
+                <button type="button" class="btn btn-success" @onclick="Authenticate">Dodaj transakcję</button>
             </div>
 
         </div>
     </div>
-
-            @model.nazwa
-            @model.opis
-            @model.kwota
-            @model.data_transakcji
-            @model.typ_transakcji
-            @model.powiadomienie
-            @model.tytul_powiadomienia
-            @model.dataa
-            @model.czas
 
 </EditForm>
 
@@ -100,37 +99,14 @@
     class Model
     {
         public ListTransactions ListTransactions { get; set; }
-        public string? name { get; set; }
-        public string? description { get; set; }
-        public float amount { get; set; }
-        public string? date_transaction { get; set; }
-        public string? notification { get; set; }
-        public string? title_notification { get; set; }
-        public string? date_notification { get; set; }
-        public string? time_notification { get; set; }
-
-        public string? nazwa = "";
-        public string? opis = "";
-        public float? kwota;
-        public string? data_transakcji;
-        public string? typ_transakcji = "";
-        public string? powiadomienie = "";
-        public string? tytul_powiadomienia = "";
-        public string? dataa;
-        public string? czas;
-
-        public void aktualizacja()
-        {
-            nazwa = $"{name}";
-            opis = $"{description}";
-            kwota = amount;
-            data_transakcji = date_transaction; 
-            typ_transakcji = $"{ListTransactions}";
-            powiadomienie = $"{notification}";
-            tytul_powiadomienia = $"{title_notification}";
-            dataa = date_notification;
-            czas = time_notification;
-        }
+        public string? name_transaction { get; set; } = "";
+        public string? description { get; set; } = "";
+        public double amount { get; set; } = 0.00;
+        public DateTime date_transaction { get; set; } = DateTime.Now.ToUniversalTime();
+        public string? name_notification { get; set; } = "";
+        public string? description_notification { get; set; } = "";
+        public DateTime date_notification { get; set; } = DateTime.Now.ToUniversalTime();
+        public TimeOnly time_notification { get; set; }
     }
 
     enum ListTransactions
@@ -138,6 +114,30 @@
         Wydatek,
         Inwestycja,
         Przychód
+    }
+
+
+    TransactionsClass gu = new TransactionsClass();
+    public UserInformation userInfo;
+
+    async Task Authenticate()
+    {
+        userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
+        var id_user = userInfo.id_user;
+
+        gu.id_user = id_user;
+        gu.name_transaction = model.name_transaction;
+        gu.description = model.description;
+        gu.amount = model.amount;
+        gu.date_transaction = model.date_transaction.ToUniversalTime();
+        gu.type_transaction = $"{model.ListTransactions}";
+        gu.name_notification = model.name_notification;
+        gu.description_notification = model.description_notification;
+        gu.date_notification = model.date_notification.ToUniversalTime();
+        gu.time_notification = model.time_notification;
+        await js.InvokeVoidAsync("alert", "Pomyślnie dodano nową transakcję!");
+        Service.AddNewTransaction(gu);
+        return;
     }
     
 }

@@ -37,7 +37,7 @@ else
                                 <td>@trans.name_transaction</td>
                                 <td>@trans.description</td>
                                 <td>@trans.amount</td>
-                                <td>@trans.date_transaction</td>
+                                <td>@trans.date_transaction.ToString("dd-MM-yyyy")</td>
                                 <td>
                                     <NavLink class="nav-link" href="/transaction">
                                         <span class="material-icons" aria-hidden="true">search</span>
@@ -52,13 +52,6 @@ else
 }
 
 @code {
-
-    //private List<Transaction> transactions = new()
-    //{
-    //    new Transaction { id = 1, name = "test", description = "test test test", amount = 15.66, date_transaction = "08.08.2022" },
-    //    new Transaction { id = 2, name = "test2", description = "test2 test2 test2", amount = 19.99, date_transaction = "08.08.2022" },
-    //    new Transaction { id = 3, name = "test3", description = "test3 test3 test3", amount = 15.94, date_transaction = "06.10.2022" }
-    //};
 
     private class Transaction
     {

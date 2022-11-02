@@ -1,6 +1,7 @@
 ﻿using AplikacjaInzynierska.Pages;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using System;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
@@ -38,7 +39,6 @@ namespace AplikacjaInzynierska.Authentication
                 return await Task.FromResult(new AuthenticationState(_anonymous));
             }
         }
-
 
         public async Task UpdateAuthenticationState(UserSession userSession)
         {

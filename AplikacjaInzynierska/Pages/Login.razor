@@ -53,6 +53,7 @@
         var userInfo = new UserInformation();
         userInfo.id_user = userAccount.id_user;
         userInfo.email = userAccount.email;
+        userInfo.id_user = userAccount.id_user;
         session.SetItemAsync("UserInfo", userInfo);
 
         var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
