@@ -90,5 +90,25 @@ namespace AplikacjaInzynierska.Services
         {
             return _dbcontext.users.FirstOrDefault(x => x.id_group == id_group);
         }
+
+        public bool AddUserGroup(GroupUserClass gc)
+        {
+            var upp = _dbcontext.users.Where(u => u.email == gc.email).First();
+            if (upp != null)
+            {
+                upp.id_user = gc.id_user;
+                upp.email = gc.email;
+                upp.id_group = gc.id_group;
+                upp.date_birthday = upp.date_birthday.ToUniversalTime();
+                _dbcontext.users.Update(upp);
+                _dbcontext.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
     }
 }

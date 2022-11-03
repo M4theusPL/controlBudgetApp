@@ -4,6 +4,8 @@
 @inject GroupUserService groupUserService
 @inherits OwningComponentBase<GroupUserService>
 @inject Blazored.SessionStorage.ISessionStorageService session
+@inject IJSRuntime js
+
 
 @if (sc == null)
 {
@@ -67,7 +69,7 @@ else
                                         <InputText class="form-control" maxlength="40" @bind-Value="model.email" />
                                     </div>
 
-                                    <button type="button" class="btn btn-success">Dodaj użytkownika</button>
+                                    <button type="button" class="btn btn-success" @onclick="Authenticate">Dodaj użytkownika</button>
                                 </div>
                             </div>
                         </EditForm>
@@ -82,7 +84,7 @@ else
     class Model
     {
         public string? groupname { get; set; }
-        public string? email { get; set; }
+        public string? email { get; set; } = "";
     }
 
     public UserInformation userInfo;
@@ -104,8 +106,43 @@ else
         else
         {
             sc = Service.displayUsersGroup(id_group);
-            //sc = Service.displayuser();
         }
     }
 
+    async Task Authenticate()
+    {
+        if (model.email != "")
+        {
+            userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
+            var email = userInfo.email;
+            var userInformation = groupUserService.GetByUserEmail(email);
+            var id_group = userInformation.id_group;
+            var userAccount = groupUserService.GetByUserEmail(model.email);
+            if (userAccount == null)
+            {
+                js.InvokeVoidAsync("alert", "Konto pod tym adresem email nie istnieje!");
+            }
+            else
+            {
+                if (userAccount.id_group == 0)
+                {
+                    GroupUserClass gu = new GroupUserClass();
+                    gu.id_user = userAccount.id_user;
+                    gu.email = userAccount.email;
+                    gu.id_group = id_group;
+                    Service.AddUserGroup(gu);
+                }
+                else
+                {
+                    js.InvokeVoidAsync("alert", "Konto pod tym adresem email już jest przypisane do innej grupy!");
+                }
+            }
+            
+        }
+        else
+        {
+            js.InvokeVoidAsync("alert", "Nie podano adresu email!");
+            return;
+        }
+    }
 }

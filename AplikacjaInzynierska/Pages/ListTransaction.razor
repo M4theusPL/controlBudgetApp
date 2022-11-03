@@ -38,11 +38,15 @@ else
                                 <td>@trans.description</td>
                                 <td>@trans.amount</td>
                                 <td>@trans.date_transaction.ToString("dd-MM-yyyy")</td>
-                                <td>
-                                    <NavLink class="nav-link" href="/transaction">
+                                @*<td>
+                                    <NavLink class="nav-link" href="/transaction/">
                                         <span class="material-icons" aria-hidden="true">search</span>
                                     </NavLink>
-                                </td>
+                                </td>*@
+
+                                 <button type="button" class="btn btn-success" >
+                                     <span class="material-icons" aria-hidden="true">search</span>
+                                 </button>
                             </tr>
                         }
                     </tbody>

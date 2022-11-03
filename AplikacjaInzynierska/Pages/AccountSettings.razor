@@ -5,6 +5,8 @@
 @inject GroupUserService groupUserService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
+@using System.Security
+@using System.Security.Claims
 @inject NavigationManager navManager
 @inherits OwningComponentBase<GroupUserService>
 @inject Blazored.SessionStorage.ISessionStorageService session
@@ -85,6 +87,7 @@
 
 
     public UserInformation userInfo;
+    private ClaimsPrincipal user;
 
     public System.Collections.Generic.IList<GroupUserClass> userr;
 
@@ -92,7 +95,6 @@
     {
         userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
         var email = userInfo.email;
-
         var userInformation = groupUserService.GetByUserEmail(email);
 
         model.name = userInformation.name;
@@ -134,7 +136,7 @@
 
                             gu.name = model.name;
                             gu.surname = model.surname;
-                        gu.date_birthday = model.date_birthday.ToUniversalTime();
+                            gu.date_birthday = model.date_birthday.ToUniversalTime();
                             gu.email = model.email;
                             gu.password = model.password;
                             string newpassword = model.newpassword;
