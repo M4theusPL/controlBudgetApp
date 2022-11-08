@@ -59,7 +59,7 @@ namespace AplikacjaInzynierska.Services
                     up.email = gc.email;
                     up.name = gc.name;
                     up.surname = gc.surname;
-                    up.date_birthday = gc.date_birthday.ToUniversalTime();
+                    up.date_birthday = gc.date_birthday.ToUniversalTime().AddDays(1);
                     up.password = up.password;
                     _dbcontext.users.Update(up);
                     _dbcontext.SaveChanges();
@@ -71,7 +71,7 @@ namespace AplikacjaInzynierska.Services
                     upp.email = gc.email;
                     upp.name = gc.name;
                     upp.surname = gc.surname;
-                    upp.date_birthday = gc.date_birthday.ToUniversalTime();
+                    upp.date_birthday = gc.date_birthday.ToUniversalTime().AddDays(1);
                     upp.password = newpassword;
                     _dbcontext.users.Update(upp);
                     _dbcontext.SaveChanges();
