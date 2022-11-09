@@ -62,6 +62,8 @@ namespace AplikacjaInzynierska.Services
             var up = _dbcontext.transactions.Where(u => u.id_user_transaction == id_user_transaction).First();
             if(up != null)
             {
+                _dbcontext.transactions.Remove(up);
+                _dbcontext.SaveChanges();
                 return true;
             }
             else

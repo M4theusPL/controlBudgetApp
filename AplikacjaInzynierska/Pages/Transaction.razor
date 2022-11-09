@@ -3,6 +3,7 @@
 @using AplikacjaInzynierska.Authentication;
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
+@inject NavigationManager navManager
 @inject IJSRuntime js
 @inject TransactionService transactionService
 @inherits OwningComponentBase<TransactionService>
@@ -148,7 +149,8 @@
 
     void DeleteTransaction()
     {
-        Service.DeleteTransaction(IdTransaction);
-        js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
+        //Service.DeleteTransaction(IdTransaction);
+        //js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
+        navManager.NavigateTo("/transactiondelete/" + IdTransaction, true);
     }
 }
