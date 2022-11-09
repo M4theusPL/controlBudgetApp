@@ -30,5 +30,45 @@ namespace AplikacjaInzynierska.Services
             _dbcontext.SaveChanges();
             return true;
         }
+
+        public bool EditTransaction(TransactionsClass gc)
+        {
+            var up = _dbcontext.transactions.Where(u => u.id_user_transaction == gc.id_user_transaction).First();
+            if (up != null)
+            {
+                up.name_transaction = gc.name_transaction;
+                up.description = gc.description;
+                up.amount = gc.amount;
+                up.date_transaction = gc.date_transaction;
+                up.type_transaction = gc.type_transaction;
+                up.name_notification = gc.name_notification;
+                up.description_notification = gc.description_notification;
+                up.date_notification = gc.date_notification;
+                up.time_notification = gc.time_notification;
+
+                _dbcontext.transactions.Update(up);
+                _dbcontext.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public bool DeleteTransaction(int id_user_transaction)
+        {
+            var up = _dbcontext.transactions.Where(u => u.id_user_transaction == id_user_transaction).First();
+            if(up != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

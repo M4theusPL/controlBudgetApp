@@ -1,7 +1,9 @@
 ﻿@page "/transaction/{idTransaction:int}"
 @attribute [Authorize(Roles = "Admin, User")]
+@using AplikacjaInzynierska.Authentication;
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
+@inject IJSRuntime js
 @inject TransactionService transactionService
 @inherits OwningComponentBase<TransactionService>
 
@@ -14,7 +16,7 @@
 
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Nazwa transakcji</label>
-                <InputText class="form-control" id="nameTransaction" @bind-Value="model.name"/>
+                <InputText class="form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
             </div>
 
             <div class="input-group mb-3">
@@ -70,8 +72,8 @@
             </div>
 
             <div>
-                <button type="button" class="btn btn-success" >Edytuj transakcję</button>
-                <button type="button" class="btn btn-danger" >Usuń transakcję</button>
+                <button type="button" class="btn btn-success" @onclick="EditTransaction" >Edytuj transakcję</button>
+                <button type="button" class="btn btn-danger" @onclick="DeleteTransaction" >Usuń transakcję</button>
             </div>
 
         </div>
@@ -90,7 +92,7 @@
     {
         public ListTransactions ListTransactions { get; set; }
         public int id_user_transaction { get; set; }
-        public string? name { get; set; }
+        public string? name_transaction { get; set; }
         public string? description { get; set; }
         public double amount { get; set; }
         public DateTime date_transaction { get; set; }
@@ -112,7 +114,7 @@
         var transactionInformation = transactionService.GetByTransaction(IdTransaction);
 
         model.id_user_transaction = transactionInformation.id_user_transaction;
-        model.name = transactionInformation.name_transaction;
+        model.name_transaction = transactionInformation.name_transaction;
         model.description = transactionInformation.description;
         model.amount = transactionInformation.amount;
         model.date_transaction = transactionInformation.date_transaction;
@@ -124,4 +126,29 @@
 
     }
 
+    void EditTransaction()
+    {
+
+        TransactionsClass gu = new TransactionsClass();
+
+        gu.id_user_transaction = model.id_user_transaction;
+        gu.name_transaction = model.name_transaction;
+        gu.description = model.description;
+        gu.amount = model.amount;
+        gu.date_transaction = model.date_transaction;
+        gu.type_transaction = $"{model.ListTransactions}";
+        gu.name_notification = model.name_notification;
+        gu.description_notification = model.description_notification;
+        gu.date_notification = model.date_notification;
+        gu.time_notification = model.time_notification;
+        Service.EditTransaction(gu);
+        js.InvokeVoidAsync("alert", "Pomyślny update!");
+
+    }
+
+    void DeleteTransaction()
+    {
+        Service.DeleteTransaction(IdTransaction);
+        js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
+    }
 }
