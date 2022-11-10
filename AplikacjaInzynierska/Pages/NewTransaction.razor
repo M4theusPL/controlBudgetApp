@@ -9,6 +9,7 @@
 @inject NavigationManager navManager
 @inherits OwningComponentBase<TransactionService>
 @inject Blazored.SessionStorage.ISessionStorageService session
+@using System.Security.Claims
 
 <datalist id="type_transaction">
     <option value="wydatek"></option>
@@ -116,16 +117,17 @@
         Przychód
     }
 
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
 
     TransactionsClass gu = new TransactionsClass();
-    public UserInformation userInfo;
 
     async Task Authenticate()
     {
-        userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
-        var id_user = userInfo.id_user;
+        var authState = await authenticationState;
+        var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-        gu.id_user = id_user;
+        gu.id_user = Int32.Parse(claimIdUser);
         gu.name_transaction = model.name_transaction;
         gu.description = model.description;
         gu.amount = model.amount;

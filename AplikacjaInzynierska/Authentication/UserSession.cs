@@ -7,6 +7,6 @@ namespace AplikacjaInzynierska.Pages
         public string UserName { get; set; }
         public string admin_group { get; set; }
         public string email { get; set; }
-        public int id_user { get; set; }
+        public string id_user { get; set; }
     }
 }

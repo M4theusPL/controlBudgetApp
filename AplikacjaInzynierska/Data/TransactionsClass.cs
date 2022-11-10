@@ -16,5 +16,6 @@ namespace AplikacjaInzynierska.Data
         public string description_notification { get; set; }
         public DateTime date_notification { get; set; }
         public TimeOnly time_notification { get; set; }
+        public int id_group { get; set; }
     }
 }

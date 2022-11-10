@@ -5,11 +5,9 @@
 @inject GroupUserService groupUserService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
-@using System.Security
 @using System.Security.Claims
 @inject NavigationManager navManager
 @inherits OwningComponentBase<GroupUserService>
-@inject Blazored.SessionStorage.ISessionStorageService session
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -85,17 +83,16 @@
         public string? repeatpassword { get; set; } = "";
     }
 
-
-    public UserInformation userInfo;
-    private ClaimsPrincipal user;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
 
     public System.Collections.Generic.IList<GroupUserClass> userr;
 
     protected override async Task OnInitializedAsync()
     {
-        userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
-        var email = userInfo.email;
-        var userInformation = groupUserService.GetByUserEmail(email);
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
 
         model.name = userInformation.name;
         model.surname = userInformation.surname;

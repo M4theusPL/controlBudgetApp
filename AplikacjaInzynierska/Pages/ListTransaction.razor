@@ -4,6 +4,9 @@
 @inject TransactionService transactionService
 @inherits OwningComponentBase<TransactionService>
 @attribute [Authorize(Roles = "Admin")]
+@inject AuthenticationStateProvider authStateProvider
+@using System.Security.Claims;
+@inject GroupUserService groupUserService
 
 @if (trans == null)
 {
@@ -67,21 +70,39 @@ else
 
     }
 
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
     public System.Collections.Generic.IList<TransactionsClass> trans;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var userTransactions = transactionService.GetByTransaction(1);
-
-        if (userTransactions == null)
+        var authState = await authenticationState;
+        var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        trans = null;
+        if (userInformation.id_group == 0)
         {
-
-            trans = null;
+            var userTransactions = transactionService.GetByTransaction(Int32.Parse(claimIdUser));
+            trans = Service.displaytransactions();
         }
         else
         {
+            var userTransactions = transactionService.GetByTransactions(Int32.Parse(claimIdUser), userInformation.id_group);
+
             trans = Service.displaytransactions();
         }
+
+        //if (userTransactions == null)
+        //{
+
+        //    trans = null;
+        //}
+        //else
+        //{
+        //    trans = Service.displaytransactions();
+        //}
         
     }
 }

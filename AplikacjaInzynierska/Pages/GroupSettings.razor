@@ -5,7 +5,8 @@
 @inherits OwningComponentBase<GroupUserService>
 @inject Blazored.SessionStorage.ISessionStorageService session
 @inject IJSRuntime js
-
+@inject AuthenticationStateProvider authStateProvider
+@using System.Security.Claims
 
 @if (sc == null)
 {
@@ -87,15 +88,17 @@ else
         public string? email { get; set; } = "";
     }
 
-    public UserInformation userInfo;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
     public System.Collections.Generic.IList<GroupUserClass> sc;
 
     protected override async Task OnInitializedAsync()
     {
-        userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
-        var email = userInfo.email;
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-        var userInformation = groupUserService.GetByUserEmail(email);
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
         var id_group = userInformation.id_group;
 
 
@@ -113,9 +116,9 @@ else
     {
         if (model.email != "")
         {
-            userInfo = await session.GetItemAsync<UserInformation>("UserInfo");
-            var email = userInfo.email;
-            var userInformation = groupUserService.GetByUserEmail(email);
+            var authState = await authenticationState;
+            var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var userInformation = groupUserService.GetByUserEmail(claimEmail);
             var id_group = userInformation.id_group;
             var userAccount = groupUserService.GetByUserEmail(model.email);
             if (userAccount == null)

@@ -30,7 +30,8 @@ namespace AplikacjaInzynierska.Authentication
                 {
                     new Claim(ClaimTypes.Name, userSession.UserName),
                     new Claim(ClaimTypes.Role, userSession.admin_group),
-                    new Claim(ClaimTypes.Email, userSession.email)
+                    new Claim(ClaimTypes.Email, userSession.email),
+                    new Claim(ClaimTypes.NameIdentifier, userSession.id_user)
                 }, "CustomAuth"));
                 return await Task.FromResult(new AuthenticationState(claimsPrincipal));
             }

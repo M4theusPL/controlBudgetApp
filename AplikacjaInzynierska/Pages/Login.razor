@@ -50,18 +50,18 @@
             return;
         }
 
-        var userInfo = new UserInformation();
-        userInfo.id_user = userAccount.id_user;
-        userInfo.email = userAccount.email;
-        userInfo.id_user = userAccount.id_user;
-        session.SetItemAsync("UserInfo", userInfo);
+        //var userInfo = new UserInformation();
+        //userInfo.id_user = userAccount.id_user;
+        //userInfo.email = userAccount.email;
+        //session.SetItemAsync("UserInfo", userInfo);
 
         var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
         await customAuthStateProvider.UpdateAuthenticationState(new UserSession
             {
                 UserName = userAccount.name,
                 email = userAccount.email,
-                admin_group = userAccount.admin_group
+                admin_group = userAccount.admin_group,
+                id_user = userAccount.id_user.ToString()
             });
         navManager.NavigateTo("/", true);
     }
