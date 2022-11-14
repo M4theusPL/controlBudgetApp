@@ -1,6 +1,7 @@
 ﻿using AplikacjaInzynierska.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Data.Entity;
 
 namespace AplikacjaInzynierska.Services
 {
@@ -23,9 +24,26 @@ namespace AplikacjaInzynierska.Services
             return _dbcontext.transactions.FirstOrDefault(x => x.id_user_transaction == id_user_transaction);
         }
 
-        public TransactionsClass? GetByTransactions(int id_user_transaction, int id_group)
+        public TransactionsClass? GetByUserTransactions(int id_user)
         {
-            return _dbcontext.transactions.FirstOrDefault(x => x.id_user_transaction == id_user_transaction && x.id_group == id_group);
+            return _dbcontext.transactions.FirstOrDefault(x => x.id_user == id_user);
+        }
+
+        public List<TransactionsClass> displayUserTransaction(int id_user)
+        {
+            var transactions = _dbcontext.transactions.Where(x => x.id_user == id_user).ToList();
+            return transactions;
+        }
+
+        public TransactionsClass? GetByGroupTransactions(int id_group)
+        {
+            return _dbcontext.transactions.FirstOrDefault(x => x.id_group == id_group);
+        }
+
+        public List<TransactionsClass> displayGroupTransaction(int id_group)
+        {
+            var transactionsGroup = _dbcontext.transactions.Where(x => x.id_group == id_group).ToList();
+            return transactionsGroup;
         }
 
         public bool AddNewTransaction(TransactionsClass gc)

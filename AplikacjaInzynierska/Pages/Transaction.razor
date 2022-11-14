@@ -7,6 +7,8 @@
 @inject IJSRuntime js
 @inject TransactionService transactionService
 @inherits OwningComponentBase<TransactionService>
+@inject GroupUserService groupUserService
+@using System.Security.Claims
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -110,21 +112,87 @@
         Przychód
     }
 
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         var transactionInformation = transactionService.GetByTransaction(IdTransaction);
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
 
-        model.id_user_transaction = transactionInformation.id_user_transaction;
-        model.name_transaction = transactionInformation.name_transaction;
-        model.description = transactionInformation.description;
-        model.amount = transactionInformation.amount;
-        model.date_transaction = transactionInformation.date_transaction;
-        //model.ListTransactions = transactionInformation.type_transaction;
-        model.name_notification = transactionInformation.name_notification;
-        model.description_notification = transactionInformation.description_notification;
-        model.date_notification = transactionInformation.date_notification;
-        model.time_notification = transactionInformation.time_notification;
+        if (transactionInformation == null)
+        {
+            model.id_user_transaction = 0;
+            model.name_transaction = "";
+            model.description = "";
+            model.amount = 0.00;
+            model.date_transaction = DateTime.Now.ToUniversalTime();
+            model.name_notification = "";
+            model.description_notification = "";
+            model.date_notification = DateTime.Now.ToUniversalTime();
+        }
+        else
+        {
+            if (transactionInformation.id_user == userInformation.id_user)
+            {
+                model.id_user_transaction = transactionInformation.id_user_transaction;
+                model.name_transaction = transactionInformation.name_transaction;
+                model.description = transactionInformation.description;
+                model.amount = transactionInformation.amount;
+                model.date_transaction = transactionInformation.date_transaction;
+                string type_transaction = transactionInformation.type_transaction;
+                model.ListTransactions = (ListTransactions)Enum.Parse(typeof(ListTransactions), type_transaction);
+                model.name_notification = transactionInformation.name_notification;
+                model.description_notification = transactionInformation.description_notification;
+                model.date_notification = transactionInformation.date_notification;
+                model.time_notification = transactionInformation.time_notification;
+            }
+            else
+            {
+                if (transactionInformation.id_group == 0)
+                {
+                    model.id_user_transaction = 0;
+                    model.name_transaction = "";
+                    model.description = "";
+                    model.amount = 0.00;
+                    model.date_transaction = DateTime.Now.ToUniversalTime();
+                    model.name_notification = "";
+                    model.description_notification = "";
+                    model.date_notification = DateTime.Now.ToUniversalTime();
+                }
+                else
+                {
+                    if (transactionInformation.id_group == userInformation.id_group)
+                    {
+                        model.id_user_transaction = transactionInformation.id_user_transaction;
+                        model.name_transaction = transactionInformation.name_transaction;
+                        model.description = transactionInformation.description;
+                        model.amount = transactionInformation.amount;
+                        model.date_transaction = transactionInformation.date_transaction;
+                        string type_transaction = transactionInformation.type_transaction;
+                        model.ListTransactions = (ListTransactions)Enum.Parse(typeof(ListTransactions), type_transaction);
+                        model.name_notification = transactionInformation.name_notification;
+                        model.description_notification = transactionInformation.description_notification;
+                        model.date_notification = transactionInformation.date_notification;
+                        model.time_notification = transactionInformation.time_notification;
+                    }
+                    else
+                    {
+                        model.id_user_transaction = 0;
+                        model.name_transaction = "";
+                        model.description = "";
+                        model.amount = 0.00;
+                        model.date_transaction = DateTime.Now.ToUniversalTime();
+                        model.name_notification = "";
+                        model.description_notification = "";
+                        model.date_notification = DateTime.Now.ToUniversalTime();
+                    }
 
+                }
+            }
+        }
     }
 
     void EditTransaction()
@@ -137,7 +205,7 @@
         gu.description = model.description;
         gu.amount = model.amount;
         gu.date_transaction = model.date_transaction;
-        gu.type_transaction = $"{model.ListTransactions}";
+        gu.type_transaction = model.ListTransactions.ToString();
         gu.name_notification = model.name_notification;
         gu.description_notification = model.description_notification;
         gu.date_notification = model.date_notification;

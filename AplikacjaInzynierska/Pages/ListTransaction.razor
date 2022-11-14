@@ -84,25 +84,29 @@ else
         trans = null;
         if (userInformation.id_group == 0)
         {
-            var userTransactions = transactionService.GetByTransaction(Int32.Parse(claimIdUser));
-            trans = Service.displaytransactions();
+            var userTransactions = transactionService.GetByUserTransactions(Int32.Parse(claimIdUser));
+            if (userTransactions == null)
+            {
+
+                trans = null;
+            }
+            else
+            {
+                trans = Service.displayUserTransaction(Int32.Parse(claimIdUser));
+            }
         }
         else
         {
-            var userTransactions = transactionService.GetByTransactions(Int32.Parse(claimIdUser), userInformation.id_group);
+            var groupTransactions = transactionService.GetByGroupTransactions(userInformation.id_group);
+            if (groupTransactions == null)
+            {
 
-            trans = Service.displaytransactions();
+                trans = null;
+            }
+            else
+            {
+                trans = Service.displayGroupTransaction(userInformation.id_group);
+            }
         }
-
-        //if (userTransactions == null)
-        //{
-
-        //    trans = null;
-        //}
-        //else
-        //{
-        //    trans = Service.displaytransactions();
-        //}
-        
     }
 }

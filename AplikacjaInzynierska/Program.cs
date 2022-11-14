@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 using AplikacjaInzynierska.Services;
 using Blazored.SessionStorage;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Myconnection");
@@ -22,6 +23,7 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<GroupUserService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddBlazoredSessionStorage();
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 

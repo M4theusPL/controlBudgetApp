@@ -1,5 +1,13 @@
 ﻿@page "/"
+@using AplikacjaInzynierska.Authentication;
+@using AplikacjaInzynierska.Data;
+@using AplikacjaInzynierska.Services;
+@inject TransactionService transactionService
+@inherits OwningComponentBase<TransactionService>
 @inject IJSRuntime js
+@inject AuthenticationStateProvider authStateProvider
+@using MudBlazor.Charts;
+@using System.Security.Claims
 
 <PageTitle>Strona Główna</PageTitle>
 
@@ -7,7 +15,20 @@
     <Authorized>
         <h1>Witaj, @context.User.Identity.Name!</h1>
         <span>
-            Statystyki
+
+
+            @*<MudChart ChartType="ChartType.Bar" InputData="@czas"  Width="100%" Height="350px">
+	            <CustomGraphics>
+		            <style>
+			            .heavy { font: bold 30px Helvetica; }
+			            .Rrrrr { font: italic 40px Helvetica; fill: rgb(62,44,221); }
+		            </style>
+		            <text x="80" y="35" class="heavy">I Love</text>
+		            <text x="105" y="70" class="Rrrrr">MudBlazor!</text>
+	            </CustomGraphics>
+            </MudChart>*@
+
+
         </span>
     </Authorized>
     <NotAuthorized>
@@ -37,5 +58,20 @@
     //    var authState = await authenticationState;
     //    var message = $"Hello {authState.User.Identity.Name}";
     //    await js.InvokeVoidAsync("alert", message);
+    //}
+
+    //public DateTime czas;
+
+    //[CascadingParameter]
+    //private Task<AuthenticationState> authenticationState { get; set; }
+
+    //public System.Collections.Generic.IList<TransactionsClass> trans;
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    var authState = await authenticationState;
+    //    var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+    //    var trans = Service.displayUserTransaction(Int32.Parse(claimIdUser));
+    //    czas = trans.date_transaction.ToString("dd-MM-yyyy");
     //}
 }
