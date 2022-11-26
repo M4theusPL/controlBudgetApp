@@ -53,6 +53,24 @@ namespace AplikacjaInzynierska.Services
             return true;
         }
 
+        public double wydatek(int id_user)
+        {
+            double test = _dbcontext.transactions.Where(r => r.id_user == id_user && r.type_transaction == "Wydatek").Sum(r => r.amount);
+            return test;
+        }
+
+        public double przychod(int id_user)
+        {
+            double test = _dbcontext.transactions.Where(r => r.id_user == id_user && r.type_transaction == "Przychód").Sum(r => r.amount);
+            return test;
+        }
+
+        public double inwestycja(int id_user)
+        {
+            double test = _dbcontext.transactions.Where(r => r.id_user == id_user && r.type_transaction == "Inwestycja").Sum(r => r.amount);
+            return test;
+        }
+
         public bool EditTransaction(TransactionsClass gc)
         {
             var up = _dbcontext.transactions.Where(u => u.id_user_transaction == gc.id_user_transaction).First();

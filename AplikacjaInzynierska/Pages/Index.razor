@@ -3,33 +3,20 @@
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
 @inject TransactionService transactionService
+@inject GroupUserService groupUserService
 @inherits OwningComponentBase<TransactionService>
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
-@using MudBlazor.Charts;
-@using System.Security.Claims
+@using System.Security.Claims;
+@using ChartJs.Blazor;
+@using ChartJs.Blazor.PieChart;
 
 <PageTitle>Strona Główna</PageTitle>
 
 <AuthorizeView>
     <Authorized>
         <h1>Witaj, @context.User.Identity.Name!</h1>
-        <span>
-
-
-            @*<MudChart ChartType="ChartType.Bar" InputData="@czas"  Width="100%" Height="350px">
-	            <CustomGraphics>
-		            <style>
-			            .heavy { font: bold 30px Helvetica; }
-			            .Rrrrr { font: italic 40px Helvetica; fill: rgb(62,44,221); }
-		            </style>
-		            <text x="80" y="35" class="heavy">I Love</text>
-		            <text x="105" y="70" class="Rrrrr">MudBlazor!</text>
-	            </CustomGraphics>
-            </MudChart>*@
-
-
-        </span>
+        <Chart Config="_config"></Chart>
     </Authorized>
     <NotAuthorized>
         <h1>Opis strony!</h1>
@@ -62,16 +49,94 @@
 
     //public DateTime czas;
 
-    //[CascadingParameter]
-    //private Task<AuthenticationState> authenticationState { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
 
-    //public System.Collections.Generic.IList<TransactionsClass> trans;
+    public System.Collections.Generic.IList<TransactionsClass> trans;
 
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    var authState = await authenticationState;
-    //    var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-    //    var trans = Service.displayUserTransaction(Int32.Parse(claimIdUser));
-    //    czas = trans.date_transaction.ToString("dd-MM-yyyy");
-    //}
+    private PieConfig _config;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationState;
+
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var userInformation = groupUserService.GetByUserEmail(claimEmail);
+            trans = null;
+            if (userInformation.id_group == 0)
+            {
+                var userTransactions = transactionService.GetByUserTransactions(Int32.Parse(claimIdUser));
+                if (userTransactions == null)
+                {
+
+                    trans = null;
+                }
+                else
+                {
+                    trans = Service.displayUserTransaction(Int32.Parse(claimIdUser));
+                }
+            }
+            else if (userInformation.id_group == null)
+            {
+                trans = null;
+            }
+            else
+            {
+                var groupTransactions = transactionService.GetByGroupTransactions(userInformation.id_group);
+                if (groupTransactions == null)
+                {
+
+                    trans = null;
+                }
+                else
+                {
+                    trans = Service.displayGroupTransaction(userInformation.id_group);
+
+                    _config = new PieConfig
+                        {
+                            Options = new PieOptions
+                            {
+                                Responsive = true,
+                                Title = new OptionsTitle
+                                {
+                                    Display = true,
+                                    Text = "Podsumowanie tego miesiąca",
+                                }
+                            }
+                        };
+
+                    foreach (string typeTransaction in new[] { "Wydatki", "Przychody", "Inwestycje" })
+                    {
+                        _config.Data.Labels.Add(typeTransaction);
+                    }
+                    
+                    double wydatek = transactionService.wydatek(Int32.Parse(claimIdUser));
+                    double przychod = transactionService.przychod(Int32.Parse(claimIdUser));
+                    double inwestycja = transactionService.inwestycja(Int32.Parse(claimIdUser));
+
+                    PieDataset<double> dataset = new PieDataset<double>(new[] { wydatek, przychod, inwestycja })
+                        {
+                            BackgroundColor = new[]
+                                {
+                    ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
+                    ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
+                    ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
+                    ColorUtil.ColorHexString(54, 162, 235), // Slice 4 aka "Blue"
+                }
+                        };
+
+                    _config.Data.Datasets.Add(dataset);
+                }
+            }
+        }
+        
+        
+
+
+
+       
+    }
 }
