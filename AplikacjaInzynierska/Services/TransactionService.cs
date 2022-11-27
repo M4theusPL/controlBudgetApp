@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data.Entity;
+using System.Security.Cryptography;
 
 namespace AplikacjaInzynierska.Services
 {
@@ -53,22 +54,73 @@ namespace AplikacjaInzynierska.Services
             return true;
         }
 
-        public double wydatek(int id_user)
+        public double Expenditure(int id_user)
         {
-            double test = _dbcontext.transactions.Where(r => r.id_user == id_user && r.type_transaction == "Wydatek").Sum(r => r.amount);
-            return test;
+            return _dbcontext.transactions.Where(x => x.id_user == id_user && x.type_transaction == "Wydatek").Sum(x => x.amount);
         }
 
-        public double przychod(int id_user)
+        public double Proceeds(int id_user)
         {
-            double test = _dbcontext.transactions.Where(r => r.id_user == id_user && r.type_transaction == "Przychód").Sum(r => r.amount);
-            return test;
+            return _dbcontext.transactions.Where(r => r.id_user == id_user && r.type_transaction == "Przychód").Sum(r => r.amount);
         }
 
-        public double inwestycja(int id_user)
+        public double Investment(int id_user)
         {
-            double test = _dbcontext.transactions.Where(r => r.id_user == id_user && r.type_transaction == "Inwestycja").Sum(r => r.amount);
-            return test;
+            return _dbcontext.transactions.Where(r => r.id_user == id_user && r.type_transaction == "Inwestycja").Sum(r => r.amount);
+        }
+
+        public double ExpenditureGroup(int id_group)
+        {
+            var month = DateTime.Now.Month;
+            var year = DateTime.Now.Year;
+            var lastDayOfMonth = DateTime.DaysInMonth(year, month);
+            var startDate = DateTime.Parse(year + "-" + month + "-01 00:00:00.000").ToUniversalTime();
+            var endDate = DateTime.Parse(year + "-" + month + "-" + lastDayOfMonth + " 23:59:59.999").ToUniversalTime();
+            return _dbcontext.transactions.Where(x => x.id_group == id_group && x.type_transaction == "Wydatek" && x.date_transaction >= startDate && x.date_transaction <= endDate).Sum(x => x.amount);
+        }
+
+        public double ProceedsGroup(int id_group)
+        {
+            var month = DateTime.Now.Month;
+            var year = DateTime.Now.Year;
+            var lastDayOfMonth = DateTime.DaysInMonth(year, month);
+            var startDate = DateTime.Parse(year + "-" + month + "-01 00:00:00.000").ToUniversalTime();
+            var endDate = DateTime.Parse(year + "-" + month + "-" + lastDayOfMonth + " 23:59:59.999").ToUniversalTime();
+            return _dbcontext.transactions.Where(r => r.id_group == id_group && r.type_transaction == "Przychód" && r.date_transaction >= startDate && r.date_transaction <= endDate).Sum(r => r.amount);
+        }
+
+        public double InvestmentGroup(int id_group)
+        {
+            var month = DateTime.Now.Month;
+            var year = DateTime.Now.Year;
+            var lastDayOfMonth = DateTime.DaysInMonth(year, month);
+            var startDate = DateTime.Parse(year+"-"+month+"-01 00:00:00.000").ToUniversalTime();
+            var endDate = DateTime.Parse(year+"-"+month+"-"+lastDayOfMonth+" 23:59:59.999").ToUniversalTime();
+            return _dbcontext.transactions.Where(r => r.id_group == id_group && r.type_transaction == "Inwestycja" && r.date_transaction >= startDate && r.date_transaction <= endDate).Sum(r => r.amount);
+        }
+
+        public double ExpenditureGroupYear(int id_group)
+        {
+            var year = DateTime.Now.Year;
+            var startDate = DateTime.Parse(year + "-01-01 00:00:00.000").ToUniversalTime();
+            var endDate = DateTime.Parse(year + "-12-31 23:59:59.999").ToUniversalTime();
+            return _dbcontext.transactions.Where(x => x.id_group == id_group && x.type_transaction == "Wydatek" && x.date_transaction >= startDate && x.date_transaction <= endDate).Sum(x => x.amount);
+        }
+
+        public double ProceedsGroupYear(int id_group)
+        {
+            var year = DateTime.Now.Year;
+            var startDate = DateTime.Parse(year + "-01-01 00:00:00.000").ToUniversalTime();
+            var endDate = DateTime.Parse(year + "-12-31 23:59:59.999").ToUniversalTime();
+            return _dbcontext.transactions.Where(r => r.id_group == id_group && r.type_transaction == "Przychód" && r.date_transaction >= startDate && r.date_transaction <= endDate).Sum(r => r.amount);
+        }
+
+        public double InvestmentGroupYear(int id_group)
+        {
+            var year = DateTime.Now.Year;
+            var startDate = DateTime.Parse(year + "-01-01 00:00:00.000").ToUniversalTime();
+            var endDate = DateTime.Parse(year + "-12-31 23:59:59.999").ToUniversalTime();
+            return _dbcontext.transactions.Where(r => r.id_group == id_group && r.type_transaction == "Inwestycja" && r.date_transaction >= startDate && r.date_transaction <= endDate).Sum(r => r.amount);
         }
 
         public bool EditTransaction(TransactionsClass gc)

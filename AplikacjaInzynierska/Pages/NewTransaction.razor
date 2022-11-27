@@ -4,6 +4,7 @@
 @using AplikacjaInzynierska.Data
 @attribute [Authorize(Roles = "Admin, User")]
 @inject TransactionService transactionService
+@inject GroupUserService groupUserService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
@@ -125,16 +126,19 @@
     {
         var authState = await authenticationState;
         var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
 
         gu.id_user = Int32.Parse(claimIdUser);
+        gu.id_group = userInformation.id_group;
         gu.name_transaction = model.name_transaction;
         gu.description = model.description;
         gu.amount = model.amount;
-        gu.date_transaction = model.date_transaction.ToUniversalTime();
-        gu.type_transaction = $"{model.ListTransactions}";
+        gu.date_transaction = model.date_transaction.ToUniversalTime().AddDays(1);
+        gu.type_transaction = model.ListTransactions.ToString();
         gu.name_notification = model.name_notification;
         gu.description_notification = model.description_notification;
-        gu.date_notification = model.date_notification.ToUniversalTime();
+        gu.date_notification = model.date_notification.ToUniversalTime().AddDays(1);
         gu.time_notification = model.time_notification;
         await js.InvokeVoidAsync("alert", "Pomyślnie dodano nową transakcję!");
         Service.AddNewTransaction(gu);
