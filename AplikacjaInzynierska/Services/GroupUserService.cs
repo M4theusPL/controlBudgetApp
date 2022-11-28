@@ -31,6 +31,10 @@ namespace AplikacjaInzynierska.Services
             return _dbcontext.users.FirstOrDefault(x => x.email == email);
         }
 
+        public GroupUserClass? GetByUserIdUser(int id_user)
+        {
+            return _dbcontext.users.FirstOrDefault(x => x.id_user == id_user);
+        }
         public async Task<GroupUserClass> GetByUserAsync(int Id)
         {
             GroupUserClass employee = await _dbcontext.users.FirstOrDefaultAsync(c => c.id_user.Equals(Id));

@@ -5,8 +5,8 @@
 @inject TransactionService transactionService
 @inject GroupUserService groupUserService
 @inherits OwningComponentBase<TransactionService>
-@inject IJSRuntime js
-@inject AuthenticationStateProvider authStateProvider
+@inject IJSRuntime js;
+@inject AuthenticationStateProvider authStateProvider;
 @using System.Security.Claims;
 @using ChartJs.Blazor;
 @using ChartJs.Blazor.PieChart;
@@ -16,8 +16,55 @@
 <AuthorizeView>
     <Authorized>
         <h1>Witaj, @context.User.Identity.Name!</h1>
-        <Chart Config="_configMonth"></Chart>
-        <Chart Config="_configYear"></Chart>
+        @if (trans == null)
+        {
+            <br />
+            <h5>Proszę dodać transakcje, aby wyświetlić statystyki.</h5>
+        }
+        else
+        {
+            if(group == 0)
+            {
+                if(amount == 1)
+                {
+                    <Chart Config="_configMonth"></Chart>
+                    
+                }
+                if(amountYear == 1)
+                {
+                    <br /><br /><hr />
+                    <Chart Config="_configYear"></Chart>
+                }
+            }
+            else
+            {
+                if(amount == 1)
+                {
+                    <Chart Config="_configMonth"></Chart>
+                    
+                }
+                if(amountYear == 1)
+                {
+                    <br /><br /><hr />
+                    <Chart Config="_configYear"></Chart>
+                }
+
+                if(amountGroup == 1)
+                {
+                    <br /><br /><hr />
+                    <Chart Config="_configMonthGroup"></Chart>
+                            
+                }
+                if(amountGroupYear == 1)
+                {
+                    <br /><br /><hr />
+                    <Chart Config="_configYearGroup"></Chart>
+                }
+                
+            }
+            
+        }
+        
     </Authorized>
     <NotAuthorized>
         <h1>Opis strony!</h1>
@@ -55,8 +102,16 @@
 
     public System.Collections.Generic.IList<TransactionsClass> trans;
 
+    public int group = 0;
+    public int amount = 1;
+    public int amountYear = 1;
+    public int amountGroup = 1;
+    public int amountGroupYear = 1;
+
     private PieConfig _configMonth;
     private PieConfig _configYear;
+    private PieConfig _configMonthGroup;
+    private PieConfig _configYearGroup;
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,68 +157,21 @@
                     double proceeds = transactionService.Proceeds(Int32.Parse(claimIdUser));
                     double investment = transactionService.Investment(Int32.Parse(claimIdUser));
 
+                    if (expenditure == 0 && proceeds == 0 && investment == 0)
+                    {
+                        amount = 0;
+                    }
+
                     PieDataset<double> dataset = new PieDataset<double>(new[] { expenditure, proceeds, investment })
                         {
                             BackgroundColor = new[]
-                                    {
+                                            {
                             ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
                             ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
                             ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
                             ColorUtil.ColorHexString(54, 162, 235), // Slice 4 aka "Blue"
                         }
-                    };
-
-                    _configMonth.Data.Datasets.Add(dataset);
-                }
-            }
-            else if (userInformation.id_group == null)
-            {
-                trans = null;
-            }
-            else
-            {
-                var groupTransactions = transactionService.GetByGroupTransactions(userInformation.id_group);
-                if (groupTransactions == null)
-                {
-
-                    trans = null;
-                }
-                else
-                {
-                    trans = Service.displayGroupTransaction(userInformation.id_group);
-
-                    _configMonth = new PieConfig
-                        {
-                            Options = new PieOptions
-                            {
-                                Responsive = true,
-                                Title = new OptionsTitle
-                                {
-                                    Display = true,
-                                    Text = "Podsumowanie tego miesiąca",
-                                }
-                            }
                         };
-
-                    foreach (string typeTransaction in new[] { "Wydatki", "Przychody", "Inwestycje" })
-                    {
-                        _configMonth.Data.Labels.Add(typeTransaction);
-                    }
-
-                    double expenditureGroup = transactionService.ExpenditureGroup(userInformation.id_group);
-                    double proceedsGroup = transactionService.ProceedsGroup(userInformation.id_group);
-                    double investmentGroup = transactionService.InvestmentGroup(userInformation.id_group);
-
-                    PieDataset<double> dataset = new PieDataset<double>(new[] { expenditureGroup, proceedsGroup, investmentGroup })
-                        {
-                            BackgroundColor = new[]
-                                        {
-                            ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
-                            ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
-                            ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
-                            ColorUtil.ColorHexString(54, 162, 235), // Slice 4 aka "Blue"
-                        }
-                    };
 
                     _configMonth.Data.Datasets.Add(dataset);
 
@@ -186,14 +194,118 @@
                         _configYear.Data.Labels.Add(typeTransaction);
                     }
 
-                    double expenditureGroupYear = transactionService.ExpenditureGroupYear(userInformation.id_group);
-                    double proceedsGroupYear = transactionService.ProceedsGroupYear(userInformation.id_group);
-                    double investmentGroupYear = transactionService.InvestmentGroupYear(userInformation.id_group);
+                    double expenditureYear = transactionService.ExpenditureYear(Int32.Parse(claimIdUser));
+                    double proceedsYear = transactionService.ProceedsYear(Int32.Parse(claimIdUser));
+                    double investmentYear = transactionService.InvestmentYear(Int32.Parse(claimIdUser));
 
-                    PieDataset<double> datasetyear = new PieDataset<double>(new[] { expenditureGroupYear, proceedsGroupYear, investmentGroupYear })
+                    if (expenditureYear == 0 && proceedsYear == 0 && investmentYear == 0)
+                    {
+                        amountYear = 0;
+                    }
+
+                    PieDataset<double> dataSetYear = new PieDataset<double>(new[] { expenditureYear, proceedsYear, investmentYear })
                         {
                             BackgroundColor = new[]
-                                            {
+                                                {
+                            ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
+                            ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
+                            ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
+                            ColorUtil.ColorHexString(54, 162, 235), // Slice 4 aka "Blue"
+                        }
+                        };
+
+                    _configYear.Data.Datasets.Add(dataSetYear);
+                }
+            }
+            else if (userInformation.id_group == null)
+            {
+                trans = null;
+            }
+            else
+            {
+                var groupTransactions = transactionService.GetByGroupTransactions(userInformation.id_group);
+                if (groupTransactions == null)
+                {
+
+                    trans = null;
+                }
+                else
+                {
+                    trans = Service.displayGroupTransaction(userInformation.id_group);
+                    group = 1;
+
+                    _configMonth = new PieConfig
+                        {
+                            Options = new PieOptions
+                            {
+                                Responsive = true,
+                                Title = new OptionsTitle
+                                {
+                                    Display = true,
+                                    Text = "Podsumowanie tego miesiąca",
+                                }
+                            }
+                        };
+
+                    foreach (string typeTransaction in new[] { "Wydatki", "Przychody", "Inwestycje" })
+                    {
+                        _configMonth.Data.Labels.Add(typeTransaction);
+                    }
+
+                    double expenditure = transactionService.Expenditure(Int32.Parse(claimIdUser));
+                    double proceeds = transactionService.Proceeds(Int32.Parse(claimIdUser));
+                    double investment = transactionService.Investment(Int32.Parse(claimIdUser));
+
+                    if (expenditure == 0 && proceeds == 0 && investment == 0)
+                    {
+                        amount = 0;
+                    }
+
+                    PieDataset<double> dataset = new PieDataset<double>(new[] { expenditure, proceeds, investment })
+                        {
+                            BackgroundColor = new[]
+                                                {
+                            ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
+                            ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
+                            ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
+                            ColorUtil.ColorHexString(54, 162, 235), // Slice 4 aka "Blue"
+                        }
+                        };
+
+                    _configMonth.Data.Datasets.Add(dataset);
+
+
+                    _configYear = new PieConfig
+                        {
+                            Options = new PieOptions
+                            {
+                                Responsive = true,
+                                Title = new OptionsTitle
+                                {
+                                    Display = true,
+                                    Text = "Podsumowanie tego roku",
+                                }
+                            }
+                        };
+
+                    foreach (string typeTransaction in new[] { "Wydatki", "Przychody", "Inwestycje" })
+                    {
+                        _configYear.Data.Labels.Add(typeTransaction);
+                    }
+
+                    double expenditureYear = transactionService.ExpenditureGroupYear(Int32.Parse(claimIdUser));
+                    double proceedsYear = transactionService.ProceedsGroupYear(Int32.Parse(claimIdUser));
+                    double investmentYear = transactionService.InvestmentGroupYear(Int32.Parse(claimIdUser));
+
+                    if (expenditureYear == 0 && proceedsYear == 0 && investmentYear == 0)
+                    {
+                        amountYear = 0;
+                    }
+
+                    PieDataset<double> datasetyear = new PieDataset<double>(new[] { expenditureYear, proceedsYear, investmentYear })
+                        {
+                            BackgroundColor = new[]
+                                                    {
                             ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
                             ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
                             ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
@@ -202,6 +314,87 @@
                         };
 
                     _configYear.Data.Datasets.Add(datasetyear);
+
+                    _configMonthGroup = new PieConfig
+                        {
+                            Options = new PieOptions
+                            {
+                                Responsive = true,
+                                Title = new OptionsTitle
+                                {
+                                    Display = true,
+                                    Text = "Podsumowanie grupy tego miesiąca",
+                                }
+                            }
+                        };
+
+                    foreach (string typeTransaction in new[] { "Wydatki", "Przychody", "Inwestycje" })
+                    {
+                        _configMonthGroup.Data.Labels.Add(typeTransaction);
+                    }
+
+                    double expenditureGroupMonth = transactionService.ExpenditureGroupMonth(userInformation.id_group);
+                    double proceedsGroupMonth = transactionService.ProceedsGroupMonth(userInformation.id_group);
+                    double investmentGroupMonth = transactionService.InvestmentGroupMonth(userInformation.id_group);
+
+                    if (expenditureGroupMonth == 0 && proceedsGroupMonth == 0 && investmentGroupMonth == 0)
+                    {
+                        amountGroup = 0;
+                    }
+
+                    PieDataset<double> dateSetGroup = new PieDataset<double>(new[] { expenditureGroupMonth, proceedsGroupMonth, investmentGroupMonth })
+                        {
+                            BackgroundColor = new[]
+                                                {
+                            ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
+                            ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
+                            ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
+                            ColorUtil.ColorHexString(54, 162, 235), // Slice 4 aka "Blue"
+                        }
+                        };
+
+                    _configMonthGroup.Data.Datasets.Add(dateSetGroup);
+
+
+                    _configYearGroup = new PieConfig
+                        {
+                            Options = new PieOptions
+                            {
+                                Responsive = true,
+                                Title = new OptionsTitle
+                                {
+                                    Display = true,
+                                    Text = "Podsumowanie grupy tego roku",
+                                }
+                            }
+                        };
+
+                    foreach (string typeTransaction in new[] { "Wydatki", "Przychody", "Inwestycje" })
+                    {
+                        _configYearGroup.Data.Labels.Add(typeTransaction);
+                    }
+
+                    double expenditureGroupYear = transactionService.ExpenditureGroupYear(userInformation.id_group);
+                    double proceedsGroupYear = transactionService.ProceedsGroupYear(userInformation.id_group);
+                    double investmentGroupYear = transactionService.InvestmentGroupYear(userInformation.id_group);
+
+                    if (expenditureGroupYear == 0 && proceedsGroupYear == 0 && investmentGroupYear == 0)
+                    {
+                        amountGroupYear = 0;
+                    }
+
+                    PieDataset<double> dataSetGroupYear = new PieDataset<double>(new[] { expenditureGroupYear, proceedsGroupYear, investmentGroupYear })
+                        {
+                            BackgroundColor = new[]
+                                                    {
+                            ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
+                            ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
+                            ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
+                            ColorUtil.ColorHexString(54, 162, 235), // Slice 4 aka "Blue"
+                        }
+                        };
+
+                    _configYearGroup.Data.Datasets.Add(dataSetGroupYear);
                 }
             }
         }

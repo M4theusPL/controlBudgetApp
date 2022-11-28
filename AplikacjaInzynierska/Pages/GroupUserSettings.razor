@@ -1,10 +1,16 @@
-﻿@page "/groupusersettings"
+﻿@page "/groupusersettings/{idUser:int}/{idGroup:int}"
+@using AplikacjaInzynierska.Authentication;
+@using AplikacjaInzynierska.Data;
+@using AplikacjaInzynierska.Services;
+@inject GroupUserService groupUserService
+@using System.Security.Claims
+
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
         <div class="col-5 border p-3 mb-2 bg-light text-dark text-center rounded">
             <p class="fs-4 fw-bold">
-                Ustawienia użytkownika: (email)
+                Ustawienia użytkownika: @model.email
             </p>
 
             <div class="input-group mb-3">
@@ -41,21 +47,87 @@
 </EditForm>
 
 @code {
+    [Parameter]
+    public int IdUser{ get; set; } = 0;
+    [Parameter]
+    public int IdGroup { get; set; } = 0;
 
-        Model model = new Model();
+    Model model = new Model();
 
-        class Model
+    class Model
+    {
+        public PermissionList PermissionList { get; set; }
+        public string? name { get; set; }
+        public string? surname { get; set; }
+        public string? email { get; set; }
+    }
+
+    enum PermissionList
+    {
+        Administrator,
+        Użytkownik
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+
+        if (IdUser == userInformation.id_user)
         {
-            public PermissionList PermissionList { get; set; }
-            public string? name { get; set; }
-            public string? surname { get; set; }
-            public string? email { get; set; }
+            string permission = userInformation.admin_group;
+            if (permission == "Admin")
+            {
+                permission = "Administrator";
+                model.PermissionList = (PermissionList)Enum.Parse(typeof(PermissionList), permission);
+                model.name = userInformation.name;
+                model.surname = userInformation.surname;
+                model.email = userInformation.email;
+            }
+            else if (permission == "User")
+            {
+                permission = "Użytkownik";
+                model.PermissionList = (PermissionList)Enum.Parse(typeof(PermissionList), permission);
+                model.name = userInformation.name;
+                model.surname = userInformation.surname;
+                model.email = userInformation.email;
+            }
         }
-
-        enum PermissionList
+        else
         {
-            Administrator,
-            Użytkownik
+            if (IdGroup == userInformation.id_group)
+            {
+                string permission = userInformation.admin_group;
+                if (permission == "Admin")
+                {
+                    userInformation = groupUserService.GetByUserIdUser(IdUser);
+                    permission = "Administrator";
+                    model.PermissionList = (PermissionList)Enum.Parse(typeof(PermissionList), permission);
+                    model.name = userInformation.name;
+                    model.surname = userInformation.surname;
+                    model.email = userInformation.email;
+                }
+                else if (permission == "User")
+                {
+                    userInformation = groupUserService.GetByUserIdUser(IdUser);
+                    permission = "Użytkownik";
+                    model.PermissionList = (PermissionList)Enum.Parse(typeof(PermissionList), permission);
+                    model.name = userInformation.name;
+                    model.surname = userInformation.surname;
+                    model.email = userInformation.email;
+                }
+            }
+            else
+            {
+                model.name = "";
+                model.surname = "";
+                model.email = "";
+            }
         }
+    }
 
 }
