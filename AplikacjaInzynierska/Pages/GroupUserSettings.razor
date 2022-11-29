@@ -2,7 +2,11 @@
 @using AplikacjaInzynierska.Authentication;
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
+@inherits OwningComponentBase<GroupUserService>
+@inject NavigationManager navManager
 @inject GroupUserService groupUserService
+@inject AuthenticationStateProvider authStateProvider;
+@inject IJSRuntime js
 @using System.Security.Claims
 
 
@@ -39,7 +43,8 @@
             </div>
 
             <div>
-                <button type="button" class="btn btn-success">Aktualizacja użytkownika</button>
+                <button type="button" class="btn btn-success" @onclick="UpdateUser" >Edytuj użytkownika</button>
+                <button type="button" class="btn btn-danger" @onclick="DeleteUser" >Usuń z grupy</button>
             </div>
 
         </div>
@@ -79,7 +84,7 @@
 
         if (IdUser == userInformation.id_user)
         {
-            string permission = userInformation.admin_group;
+            var permission = userInformation.admin_group;
             if (permission == "Admin")
             {
                 permission = "Administrator";
@@ -101,10 +106,10 @@
         {
             if (IdGroup == userInformation.id_group)
             {
-                string permission = userInformation.admin_group;
+                userInformation = groupUserService.GetByUserIdUser(IdUser);
+                var permission = userInformation.admin_group;
                 if (permission == "Admin")
                 {
-                    userInformation = groupUserService.GetByUserIdUser(IdUser);
                     permission = "Administrator";
                     model.PermissionList = (PermissionList)Enum.Parse(typeof(PermissionList), permission);
                     model.name = userInformation.name;
@@ -113,7 +118,6 @@
                 }
                 else if (permission == "User")
                 {
-                    userInformation = groupUserService.GetByUserIdUser(IdUser);
                     permission = "Użytkownik";
                     model.PermissionList = (PermissionList)Enum.Parse(typeof(PermissionList), permission);
                     model.name = userInformation.name;
@@ -128,6 +132,87 @@
                 model.email = "";
             }
         }
+    }
+
+    async Task UpdateUser()
+    {
+        var userAccount = groupUserService.GetByUserEmail(model.email);
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+
+        if (userAccount == null)
+        {
+            js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
+        }
+        else
+        {
+            GroupUserClass gu = new GroupUserClass();
+            if (IdUser == userInformation.id_user)
+            {
+                var permission = model.PermissionList.ToString();
+                if (permission == "Administrator")
+                {
+                    permission = "Admin";
+                    gu.name = model.name;
+                    gu.surname = model.surname;
+                    gu.email = model.email;
+                    gu.admin_group = permission;
+                    Service.EditUserGroup(gu);
+                    js.InvokeVoidAsync("alert", "Pomyślny update!");
+                }
+                else if (permission == "Użytkownik")
+                {
+                    permission = "User";
+                    gu.name = model.name;
+                    gu.surname = model.surname;
+                    gu.email = model.email;
+                    gu.admin_group = permission;
+                    Service.EditUserGroup(gu);
+                    js.InvokeVoidAsync("alert", "Pomyślny update!");
+                }
+            }
+            else
+            {
+                if (IdGroup == userInformation.id_group)
+                {
+                    var permission = model.PermissionList.ToString();
+                    if (permission == "Administrator")
+                    {
+                        permission = "Admin";
+                        gu.name = model.name;
+                        gu.surname = model.surname;
+                        gu.email = model.email;
+                        gu.admin_group = permission;
+                        Service.EditUserGroup(gu);
+                        js.InvokeVoidAsync("alert", "Pomyślny update!");
+                    }
+                    else if (permission == "Użytkownik")
+                    {
+                        permission = "User";
+                        gu.name = model.name;
+                        gu.surname = model.surname;
+                        gu.email = model.email;
+                        gu.admin_group = permission;
+                        Service.EditUserGroup(gu);
+                        js.InvokeVoidAsync("alert", "Pomyślny update!");
+                    }
+                }
+                else
+                {
+                    js.InvokeVoidAsync("alert", "Nie pomyślny update!");
+                }
+
+            }
+        }
+
+    }
+
+    void DeleteUser()
+    {
+        //Service.DeleteTransaction(IdTransaction);
+        //js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
+        navManager.NavigateTo("/userdeletefromgroup/" + IdUser + "/" + IdGroup, true);
     }
 
 }

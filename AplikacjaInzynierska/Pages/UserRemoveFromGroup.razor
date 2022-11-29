@@ -1,0 +1,35 @@
+﻿@page "/userdeletefromgroup/{idUser:int}/{idGroup:int}";
+@using AplikacjaInzynierska.Authentication;
+@using AplikacjaInzynierska.Data;
+@using AplikacjaInzynierska.Services;
+@inject NavigationManager navManager
+@inject IJSRuntime js
+@inherits OwningComponentBase<TransactionService>
+
+<div class="row justify-content-md-center text-center">
+    <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
+        <p class="fs-4 fw-bold">Czy na pewno chcesz usunąć użytkownika z grupy z adresem email: ?</p>
+            @*<button type="button" class="btn btn-success" @onclick="DeleteTransaction" >Tak</button>
+            <button type="button" class="btn btn-danger" @onclick="CancelDeleteTransaction" >Nie</button>*@
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int IdUser { get; set; } = 0;
+    [Parameter]
+    public int IdGroup { get; set; } = 0;
+
+    //void DeleteTransaction()
+    //{
+    //    Service.DeleteTransaction(IdTransaction);
+    //    js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
+    //    navManager.NavigateTo("/listtransaction/", true);
+    //}
+
+    //void CancelDeleteTransaction()
+    //{
+    //    navManager.NavigateTo("/transaction/" + IdTransaction, true);
+    //}
+
+}

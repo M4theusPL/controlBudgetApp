@@ -90,6 +90,29 @@ namespace AplikacjaInzynierska.Services
            
         }
 
+        public bool EditUserGroup(GroupUserClass gc)
+        {
+            var up = _dbcontext.users.Where(u => u.email == gc.email).First();
+            if (up != null)
+            {
+                up.email = gc.email;
+                up.name = gc.name;
+                up.surname = gc.surname;
+                up.password = up.password;
+                up.date_birthday = up.date_birthday.ToUniversalTime().AddDays(1);
+                up.admin_group = gc.admin_group;
+                up.id_group = up.id_group;
+                _dbcontext.users.Update(up);
+                _dbcontext.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
         public GroupUserClass? GetByIdGroup(int id_group)
         {
             return _dbcontext.users.FirstOrDefault(x => x.id_group == id_group);
