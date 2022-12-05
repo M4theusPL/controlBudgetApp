@@ -188,6 +188,55 @@ namespace AplikacjaInzynierska.Services
 
         }
 
+        public bool RemoveTransactionsGroup(int id_user)
+        {
+            var up = _dbcontext.transactions.Where(u => u.id_user == id_user).ToList();
+            if (up != null)
+            {
+                foreach (var xr in up)
+                {
+                    xr.id_user = id_user;
+                    xr.id_group = 0;
+                    xr.date_notification = xr.date_notification.ToUniversalTime().AddDays(1);
+                    xr.date_transaction = xr.date_transaction.ToUniversalTime().AddDays(1);
+                    _dbcontext.transactions.Update(xr);
+                }
+                
+                
+                _dbcontext.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public bool AddTransactionGroup(int id_user, int id_group)
+        {
+            var up = _dbcontext.transactions.Where(u => u.id_user == id_user).ToList();
+            if (up != null)
+            {
+                foreach (var xr in up)
+                {
+                    xr.id_user = id_user;
+                    xr.id_group = id_group;
+                    xr.date_notification = xr.date_notification.ToUniversalTime().AddDays(1);
+                    xr.date_transaction = xr.date_transaction.ToUniversalTime().AddDays(1);
+                    _dbcontext.transactions.Update(xr);
+                }
+                
+                
+                _dbcontext.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
         public bool DeleteTransaction(int id_user_transaction)
         {
             var up = _dbcontext.transactions.Where(u => u.id_user_transaction == id_user_transaction).First();

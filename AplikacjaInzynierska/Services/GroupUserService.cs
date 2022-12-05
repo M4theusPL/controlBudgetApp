@@ -113,6 +113,27 @@ namespace AplikacjaInzynierska.Services
 
         }
 
+        public bool RemoveUserGroup(int id_user)
+        {
+            var up = _dbcontext.users.Where(u => u.id_user == id_user).First();
+            if (up != null)
+            {
+                up.email = up.email;
+                up.password = up.password;
+                up.date_birthday = up.date_birthday.ToUniversalTime().AddDays(1);
+                up.admin_group = "Admin";
+                up.id_group = 0;
+                _dbcontext.users.Update(up);
+                _dbcontext.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
         public GroupUserClass? GetByIdGroup(int id_group)
         {
             return _dbcontext.users.FirstOrDefault(x => x.id_group == id_group);

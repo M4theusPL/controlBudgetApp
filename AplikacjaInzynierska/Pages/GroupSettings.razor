@@ -1,8 +1,9 @@
 ﻿@page "/groupsettings"
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
+@inject TransactionService transactionService
 @inject GroupUserService groupUserService
-@inherits OwningComponentBase<GroupUserService>
+@inject NavigationManager navManager
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims
@@ -107,7 +108,7 @@ else
         }
         else
         {
-            sc = Service.displayUsersGroup(id_group);
+            sc = groupUserService.displayUsersGroup(id_group);
         }
     }
 
@@ -132,7 +133,10 @@ else
                     gu.id_user = userAccount.id_user;
                     gu.email = userAccount.email;
                     gu.id_group = id_group;
-                    Service.AddUserGroup(gu);
+                    groupUserService.AddUserGroup(gu);
+                    transactionService.AddTransactionGroup(userAccount.id_user, id_group);
+                    js.InvokeVoidAsync("alert", "Pomyślnie dodano użytkownika do grupy!");
+                    navManager.NavigateTo("/groupsettings", true);
                 }
                 else
                 {
