@@ -6,6 +6,7 @@
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
+@using System.Security.Cryptography;
 
 <EditForm Model="@model">
     <div class="row justify-content-md-center">
@@ -43,7 +44,12 @@
     {
         var userAccount = groupUserService.GetByUserEmail(model.email);
 
-        if (userAccount == null || userAccount.password != model.password)
+        var sha256 = SHA256.Create();
+        var passwordBytes = System.Text.Encoding.UTF8.GetBytes(model.password);
+        var passwordHash = sha256.ComputeHash(passwordBytes);
+        string passwordHashed = BitConverter.ToString(passwordHash).Replace("-", "").ToLower();
+
+        if (userAccount == null || userAccount.password != passwordHashed)
         {
             await js.InvokeVoidAsync("alert", "Podano zły login lub hasło!");
             return;

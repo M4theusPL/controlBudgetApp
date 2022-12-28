@@ -8,6 +8,7 @@
 @using System.Security.Claims
 @inject NavigationManager navManager
 @inherits OwningComponentBase<GroupUserService>
+@using System.Security.Cryptography;
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -125,18 +126,27 @@
                 }
                 else
                 {
-                    if (model.password == userAccount.password)
+                    var sha256 = SHA256.Create();
+                    var passwordBytes = System.Text.Encoding.UTF8.GetBytes(model.password);
+                    var passwordHash = sha256.ComputeHash(passwordBytes);
+                    string passwordHashed = BitConverter.ToString(passwordHash).Replace("-", "").ToLower();
+
+                    if (passwordHashed == userAccount.password)
                     {
                         if ((model.newpassword != "") && (model.newpassword == model.repeatpassword))
                         {
                             GroupUserClass gu = new GroupUserClass();
 
+                            var newPasswordBytes = System.Text.Encoding.UTF8.GetBytes(model.newpassword);
+                            var newPasswordHash = sha256.ComputeHash(newPasswordBytes);
+                            string newPasswordHashed = BitConverter.ToString(newPasswordHash).Replace("-", "").ToLower();
+
                             gu.name = model.name;
                             gu.surname = model.surname;
                             gu.date_birthday = model.date_birthday;
                             gu.email = model.email;
-                            gu.password = model.password;
-                            string newpassword = model.newpassword;
+                            gu.password = passwordHashed;
+                            string newpassword = newPasswordHashed;
 
                             Service.EditUser(gu, newpassword);
                             model.password = "";
