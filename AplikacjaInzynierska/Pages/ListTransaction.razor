@@ -19,7 +19,11 @@ else
     <div class="row justify-content-md-center text-center">
         <p class="fs-4 fw-bold">Lista transakcji</p>
         <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
-                
+            @President
+                    <div class="form-group">
+                                                        <input type="text" class="form-control" @bind="President" @bind:event="oninput" @onchange="@NameChanged" /> 
+                         </div>
+                         
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr class="fw-bold">
@@ -70,10 +74,27 @@ else
 
     }
 
+    private string President { get; set; } = "";
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
     public System.Collections.Generic.IList<TransactionsClass> trans;
+
+    private async Task NameChanged(ChangeEventArgs args)
+    {
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        if (President.Trim().Length > 0)
+        {
+            trans = Service.displayGroupSearchTransaction(userInformation.id_group, President);
+        }
+        else
+        {
+            trans = Service.displayGroupTransaction(userInformation.id_group);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -105,8 +126,17 @@ else
             }
             else
             {
-                trans = Service.displayGroupTransaction(userInformation.id_group);
+                if (President.Trim().Length > 0)
+                {
+                    trans = Service.displayGroupSearchTransaction(userInformation.id_group, President);
+                }
+                else 
+                {
+                    trans = Service.displayGroupTransaction(userInformation.id_group);
+                }             
             }
         }
     }
+
+    
 }

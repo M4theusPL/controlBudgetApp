@@ -47,6 +47,18 @@ namespace AplikacjaInzynierska.Services
             return transactionsGroup;
         }
 
+        public List<TransactionsClass> displayGroupSearchTransaction(int id_group, string name_transaction)
+        {
+            var transactionsGroup = _dbcontext.transactions.Where(x => x.id_group == id_group
+            && EF.Functions.Like(x.name_transaction, $"%{name_transaction}%")
+            || EF.Functions.Like(x.description, $"%{name_transaction}%")
+            || EF.Functions.Like((string?) Convert.ToString(x.amount), $"%{name_transaction}%")
+            || EF.Functions.Like((string?) (object) x.date_transaction, $"%{name_transaction}%")
+            || EF.Functions.Like((string?) Convert.ToString(x.id_user_transaction), $"%{name_transaction}%")
+            ).ToList();
+            return transactionsGroup;
+        }
+
         public bool AddNewTransaction(TransactionsClass gc)
         {
             _dbcontext.transactions.Add(gc);
