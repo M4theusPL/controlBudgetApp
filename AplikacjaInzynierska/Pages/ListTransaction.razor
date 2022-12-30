@@ -19,10 +19,9 @@ else
     <div class="row justify-content-md-center text-center">
         <p class="fs-4 fw-bold">Lista transakcji</p>
         <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
-            @President
-                    <div class="form-group">
-                                                        <input type="text" class="form-control" @bind="President" @bind:event="oninput" @onchange="@NameChanged" /> 
-                         </div>
+                <div class="form-group">
+                            Wyszukiwana fraza: <input type="text" class="form-control" @bind="SearchedText" @bind:event="oninput" @onchange="@NameChanged" /> 
+                </div>
                          
                 <table class="table table-striped table-hover">
                     <thead>
@@ -44,16 +43,13 @@ else
                                 <td>@trans.name_transaction</td>
                                 <td>@trans.description</td>
                                 <td>@trans.amount</td>
-                                <td>@trans.date_transaction.ToString("dd-MM-yyyy")</td>
+                                <td>@trans.date_transaction.ToString("yyyy-MM-dd")</td>
                                 <td>
                                     <a class="nav-link" href="/transaction/@trans.id_user_transaction">
                                         <span class="material-icons" aria-hidden="true">search</span>
                                     </a>
                                 </td>
 
-                                 @*<button type="button" class="btn btn-success" >
-                                     <span class="material-icons" aria-hidden="true">search</span>
-                                 </button>*@
                             </tr>
                         }
                     </tbody>
@@ -74,7 +70,7 @@ else
 
     }
 
-    private string President { get; set; } = "";
+    private string SearchedText { get; set; } = "";
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
@@ -86,9 +82,9 @@ else
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         var userInformation = groupUserService.GetByUserEmail(claimEmail);
-        if (President.Trim().Length > 0)
+        if (SearchedText.Trim().Length > 0)
         {
-            trans = Service.displayGroupSearchTransaction(userInformation.id_group, President);
+            trans = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText);
         }
         else
         {
@@ -126,9 +122,9 @@ else
             }
             else
             {
-                if (President.Trim().Length > 0)
+                if (SearchedText.Trim().Length > 0)
                 {
-                    trans = Service.displayGroupSearchTransaction(userInformation.id_group, President);
+                    trans = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText);
                 }
                 else 
                 {
