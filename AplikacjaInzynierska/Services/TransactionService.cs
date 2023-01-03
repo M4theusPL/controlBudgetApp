@@ -43,11 +43,11 @@ namespace AplikacjaInzynierska.Services
 
         public List<TransactionsClass> displayGroupTransaction(int id_group)
         {
-            var transactionsGroup = _dbcontext.transactions.Where(x => x.id_group == id_group).ToList();
+            var transactionsGroup = _dbcontext.transactions.Where(x => x.id_group == id_group).OrderBy(s => s.id_user_transaction).ToList();
             return transactionsGroup;
         }
 
-        public List<TransactionsClass> displayGroupSearchTransaction(int id_group, string searchedText)
+        public List<TransactionsClass> displayGroupSearchTransaction(int id_group, string searchedText, int sorting)
         {
             var transactionsGroup = _dbcontext.transactions.Where(x => x.id_group == id_group
             && EF.Functions.Like(x.name_transaction, $"%{searchedText}%")
@@ -55,8 +55,43 @@ namespace AplikacjaInzynierska.Services
             || EF.Functions.Like((string?) Convert.ToString(x.amount), $"%{searchedText}%")
             || EF.Functions.Like((string?) (object) x.date_transaction, $"%{searchedText}%")
             || EF.Functions.Like((string?) Convert.ToString(x.id_user_transaction), $"%{searchedText}%")
-            ).ToList();
-            return transactionsGroup;
+            );
+
+            switch (sorting)
+            {
+                case 1:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.id_user_transaction);
+                    break;
+                case 2:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.id_user_transaction);
+                    break;
+                case 3:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.name_transaction);
+                    break;
+                case 4:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.name_transaction);
+                    break;
+                case 5:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.description);
+                    break;
+                case 6:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.description);
+                    break;
+                case 7:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.amount);
+                    break;
+                case 8:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.amount);
+                    break;
+                case 9:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.date_transaction);
+                    break;
+                case 10:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.date_transaction);
+                    break;
+            }
+
+            return transactionsGroup.ToList();
         }
 
         public bool AddNewTransaction(TransactionsClass gc)

@@ -7,6 +7,8 @@
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims;
 @inject GroupUserService groupUserService
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
 
 @if (trans == null)
 {
@@ -21,10 +23,20 @@ else
         <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
                 <div class="row justify-content-md-center">
                     <div class="col-5 mb-2 bg-light text-dark text-center rounded">
+                       <EditForm Model="filter">
                         <div class="input-group mb-3">
                             <label class="col-sm-5 input-group-text" >Wyszukiwana fraza</label>
                             <input type="text" class="form-control" @bind="SearchedText" @bind:event="oninput" @onchange="@NameChanged" /> 
                         </div>
+                        
+                            Sortuj od
+                            <select Id="CountryList" class="form-group" @bind="SelectedValue" @bind:event="oninput" @onchange="@NameChanged">
+                                @foreach (var item in Countries)
+                                {
+                                    <option value="@item.IdFilter">@item.Title</option>
+                                }
+                            </select>
+                        </EditForm>
                     </div>
                 </div>
                          
@@ -72,10 +84,20 @@ else
         public string? description { get; set; }
         public double amount { get; set; }
         public string? date_transaction { get; set; }
-
     }
 
     private string SearchedText { get; set; } = "";
+
+    public Filter filter = new Filter();
+    public int SelectedValue { get; set; } = 1;
+    public int sorting = 1;
+
+    public class Filter
+    {
+        public int IdFilter { get; set; }
+    public string Title { get; set; }
+    }
+    public List<Filter> Countries { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
@@ -87,18 +109,62 @@ else
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         var userInformation = groupUserService.GetByUserEmail(claimEmail);
-        if (SearchedText.Trim().Length > 0)
-        {
-            trans = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText);
-        }
-        else
-        {
-            trans = Service.displayGroupTransaction(userInformation.id_group);
-        }
-    }
 
+        switch (SelectedValue)
+        {
+            case 1:
+                sorting = 1;
+                break;
+            case 2:
+                sorting = 2;
+                break;
+            case 3:
+                sorting = 3;
+                break;
+            case 4:
+                sorting = 4;
+                break;
+            case 5:
+                sorting = 5;
+                break;
+            case 6:
+                sorting = 6;
+                break;
+            case 7:
+                sorting = 7;
+                break;
+            case 8:
+                sorting = 8;
+                break;
+            case 9:
+                sorting = 9;
+                break;
+            case 10:
+                sorting = 10;
+                break;
+        }
+        await JSRuntime.InvokeAsync<object>("console.log", sorting);
+
+        trans = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText, sorting);
+    }
+    
     protected override async Task OnInitializedAsync()
     {
+        Countries = new List<Filter>()
+        {
+            new Filter{IdFilter = 1, Title = "ID rosnąco"},
+            new Filter{IdFilter = 2, Title = "ID malejąco"},
+            new Filter{IdFilter = 3, Title = "nazwy A-Z"},
+            new Filter{IdFilter = 4, Title = "nazwy Z-A"},
+            new Filter{IdFilter = 5, Title = "opisu A-Z"},
+            new Filter{IdFilter = 6, Title = "opisu Z-A"},
+            new Filter{IdFilter = 7, Title = "kwoty rosnąco"},
+            new Filter{IdFilter = 8, Title = "kwoty malejąco"},
+            new Filter{IdFilter = 9, Title = "daty transakcji najnowszej"},
+            new Filter{IdFilter = 10, Title = "daty transakcji najstarszej"},
+        };
+
+
         var authState = await authenticationState;
         var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
@@ -129,7 +195,7 @@ else
             {
                 if (SearchedText.Trim().Length > 0)
                 {
-                    trans = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText);
+                    trans = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText, sorting);
                 }
                 else 
                 {
@@ -138,6 +204,5 @@ else
             }
         }
     }
-
-    
+   
 }
