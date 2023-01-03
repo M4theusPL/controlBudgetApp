@@ -8,6 +8,11 @@
 @using System.Security.Claims;
 @inject GroupUserService groupUserService
 @using Microsoft.JSInterop
+@using iTextSharp.text;
+@using iTextSharp.text.pdf;
+@using System.IO;
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Mvc;
 @inject IJSRuntime JSRuntime
 
 @if (trans == null)
@@ -37,6 +42,7 @@ else
                                 }
                             </select>
                         </EditForm>
+                        <button onclick="@PDFGenerate">PDF</button>
                     </div>
                 </div>
                          
@@ -95,7 +101,7 @@ else
     public class Filter
     {
         public int IdFilter { get; set; }
-    public string Title { get; set; }
+        public string Title { get; set; }
     }
     public List<Filter> Countries { get; set; }
 
@@ -103,6 +109,52 @@ else
     private Task<AuthenticationState> authenticationState { get; set; }
 
     public System.Collections.Generic.IList<TransactionsClass> trans;
+
+    public async Task<byte[]> PDFGenerate()
+    {
+        var authState = await authenticationState;
+        var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        using (var stream = new MemoryStream())
+        {
+            var document = new Document();
+            var writer = PdfWriter.GetInstance(document, stream);
+            document.Open();
+
+            // Pobierz listę
+            var data = trans;
+
+            // Utwórz tabelę o 3 kolumnach
+            var table = new PdfPTable(3);
+
+            // Dodaj nagłówki do tabeli
+            table.AddCell("ID");
+            table.AddCell("Nazwa");
+            table.AddCell("Kwota");
+
+            // Dodaj dane do tabeli
+            foreach (var item in data)
+            {
+                table.AddCell(item.id_user_transaction.ToString());
+                table.AddCell(item.name_transaction);
+                table.AddCell(item.amount.ToString());
+            }
+
+            // Dodaj tabelę do dokumentu
+            document.Add(table);
+
+            document.Close();
+
+            // Pobierz tablicę bajtów zawierającą plik PDF
+            var fileBytes = stream.ToArray();
+
+            // Ustaw odpowiednie nagłówki HTTP i wyświetl plik PDF w przeglądarce
+            await JSRuntime.InvokeAsync<string>("ShowPDF", Convert.ToBase64String(fileBytes));
+            return stream.ToArray();
+        }
+        
+    }
 
     private async Task NameChanged(ChangeEventArgs args)
     {
@@ -147,7 +199,7 @@ else
 
         trans = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText, sorting);
     }
-    
+
     protected override async Task OnInitializedAsync()
     {
         Countries = new List<Filter>()
