@@ -120,36 +120,51 @@ else
         {
             var document = new Document();
             var writer = PdfWriter.GetInstance(document, stream);
+            DateTime dateNow = DateTime.Now.ToUniversalTime();
             document.Open();
 
-            // Pobierz listę
-            var data = trans;
+            Paragraph paragraph = new Paragraph("NAZWA APLIKACJI", new Font(Font.HELVETICA, 21, Font.BOLD));
+            paragraph.Alignment = Element.ALIGN_LEFT;
+            document.Add(paragraph);
+            document.Add(new Paragraph(" "));
 
-            // Utwórz tabelę o 3 kolumnach
-            var table = new PdfPTable(3);
+            paragraph = new Paragraph("Raport z dnia " + dateNow.ToString("yyyy-MM-dd"), new Font(Font.HELVETICA, 18, Font.BOLD));
+            paragraph.Alignment = Element.ALIGN_CENTER;
+            document.Add(paragraph);
+            document.Add(new Paragraph(" "));
 
-            // Dodaj nagłówki do tabeli
-            table.AddCell("ID");
-            table.AddCell("Nazwa");
-            table.AddCell("Kwota");
+            var table = new PdfPTable(5);
+            float[] widths = new float[] { 40f, 100f, 150f, 75f, 110f };
+            table.SetWidths(widths);
 
-            // Dodaj dane do tabeli
-            foreach (var item in data)
+            PdfPCell cell = new PdfPCell(new Phrase("ID", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            table.AddCell(cell);
+
+            cell = new PdfPCell(new Phrase("Nazwa", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            table.AddCell(cell);
+
+            cell = new PdfPCell(new Phrase("Opis", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            table.AddCell(cell);
+
+            cell = new PdfPCell(new Phrase("Kwota", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            table.AddCell(cell);
+
+            cell = new PdfPCell(new Phrase("Data transakcji", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            table.AddCell(cell);
+
+            foreach (var item in trans)
             {
                 table.AddCell(item.id_user_transaction.ToString());
                 table.AddCell(item.name_transaction);
+                table.AddCell(item.description);
                 table.AddCell(item.amount.ToString());
+                table.AddCell(item.date_transaction.ToString("yyyy-MM-dd"));
             }
 
-            // Dodaj tabelę do dokumentu
             document.Add(table);
-
             document.Close();
-
-            // Pobierz tablicę bajtów zawierającą plik PDF
             var fileBytes = stream.ToArray();
 
-            // Ustaw odpowiednie nagłówki HTTP i wyświetl plik PDF w przeglądarce
             await JSRuntime.InvokeAsync<string>("ShowPDF", Convert.ToBase64String(fileBytes));
             return stream.ToArray();
         }
