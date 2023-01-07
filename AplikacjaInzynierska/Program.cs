@@ -17,9 +17,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<GroupUserService>();
 builder.Services.AddScoped<TransactionService>();
+builder.Services.AddScoped<LogsService>();
 
 var app = builder.Build();
 

@@ -3,11 +3,11 @@
 @using AplikacjaInzynierska.Services
 @using AplikacjaInzynierska.Data
 @inject GroupUserService groupUserService
+@inject LogsService logsService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims
 @inject NavigationManager navManager
-@inherits OwningComponentBase<GroupUserService>
 @using System.Security.Cryptography;
 
 <EditForm Model="model">
@@ -88,6 +88,7 @@
     private Task<AuthenticationState> authenticationState { get; set; }
 
     public System.Collections.Generic.IList<GroupUserClass> userr;
+    LogsClass log = new LogsClass();
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,13 +105,24 @@
     void Authenticate()
     {
         var userAccount = groupUserService.GetByUserEmail(model.email);
-        
+
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = userAccount.id_user;
+
             if (userAccount == null)
             {
+                log.event_log = "failed update account. there is an account with the address: " + model.email;
+                logsService.AddNewEvent(log);
                 js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
             }
             else
             {
+                
+
                 if (model.password == "")
                 {
                     GroupUserClass gu = new GroupUserClass();
@@ -121,8 +133,11 @@
                     gu.email = model.email;
                     string newpassword = null;
 
-                    Service.EditUser(gu, newpassword);
+                    groupUserService.EditUser(gu, newpassword);
+                    log.event_log = "successful update account without password";
+                    logsService.AddNewEvent(log);
                     js.InvokeVoidAsync("alert", "Pomyślny update!");
+                    return;
                 }
                 else
                 {
@@ -148,11 +163,17 @@
                             gu.password = passwordHashed;
                             string newpassword = newPasswordHashed;
 
-                            Service.EditUser(gu, newpassword);
+                            groupUserService.EditUser(gu, newpassword);
                             model.password = "";
                             model.newpassword = "";
                             model.repeatpassword = "";
+
+                            
+                            log.event_log = "successful update account with password";
+                            logsService.AddNewEvent(log);
+
                             js.InvokeVoidAsync("alert", "Pomyślny update z hasłem!");
+                            return;
                         }
                         else
                         {
@@ -160,6 +181,9 @@
                             model.password = "";
                             model.newpassword = "";
                             model.repeatpassword = "";
+                            log.event_log = "failed update account with password";
+                            logsService.AddNewEvent(log);
+                            return;
                         }
                         
                     }
@@ -169,6 +193,9 @@
                         model.password = "";
                         model.newpassword = "";
                         model.repeatpassword = "";
+                        log.event_log = "failed update account with password";
+                        logsService.AddNewEvent(log);
+                        return;
                     }
                 }
         }

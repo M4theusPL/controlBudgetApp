@@ -299,5 +299,12 @@ namespace AplikacjaInzynierska.Services
             }
         }
 
+        public int showTopIdTransactionUser(int id_user)
+        {
+            var listTransactions = _dbcontext.transactions.Where(u => u.id_user == id_user);
+            var topTransaction = listTransactions.Max(x => x.id_user_transaction);
+            return topTransaction;
+        }
+
     }
 }

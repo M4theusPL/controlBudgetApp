@@ -3,10 +3,10 @@
 @using AplikacjaInzynierska.Services
 @using AplikacjaInzynierska.Data
 @inject GroupUserService groupUserService
+@inject LogsService logsService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
-@inherits OwningComponentBase<GroupUserService>
 @using System.Security.Cryptography;
 
 <EditForm Model="model" >
@@ -66,10 +66,17 @@
     }
 
     GroupUserClass gu = new GroupUserClass();
-
+    LogsClass log = new LogsClass();
 
     void Authenticate()
     {
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = 0;
+
         if (model.password == model.repeatpassword)
         {
             var userAccount = groupUserService.GetByUserEmail(model.email);
@@ -88,19 +95,31 @@
                 gu.date_birthday = model.date_birthday.ToUniversalTime();
                 gu.email = model.email;
                 gu.password = passwordHashed;
-                Service.AddNewUser(gu);
+                groupUserService.AddNewUser(gu);
                 navManager.NavigateTo("/accountcreatedsuccessfully", true);
+
+                log.event_log = "successful register account: " + model.email;
+                logsService.AddNewEvent(log);
             }
             else
             {
                 js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
+                log.event_log = "failed register account: " + model.email;
+                logsService.AddNewEvent(log);
+                model.password = "";
+                model.repeatpassword = "";
+                log = new LogsClass();
+                return;
             }
         }
         else 
         {
             js.InvokeVoidAsync("alert", "Hasła się nie zgadzają!");
+            log.event_log = "failed register account: " + model.email;
+            logsService.AddNewEvent(log);
             model.password = "";
             model.repeatpassword = "";
+            log = new LogsClass();
             return;
         }
     }

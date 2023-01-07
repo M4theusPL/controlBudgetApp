@@ -5,10 +5,10 @@
 @attribute [Authorize(Roles = "Admin, User")]
 @inject TransactionService transactionService
 @inject GroupUserService groupUserService
+@inject LogsService logsService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
-@inherits OwningComponentBase<TransactionService>
 @using System.Security.Claims
 
 <datalist id="type_transaction">
@@ -95,7 +95,7 @@
 
 @code {
 
-    Model model = new Model();
+        Model model = new Model();
 
     class Model
     {
@@ -121,6 +121,7 @@
     private Task<AuthenticationState> authenticationState { get; set; }
 
     TransactionsClass gu = new TransactionsClass();
+    LogsClass log = new LogsClass();
 
     async Task Authenticate()
     {
@@ -128,6 +129,14 @@
         var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         var userInformation = groupUserService.GetByUserEmail(claimEmail);
+
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = userInformation.id_user;
+
 
         gu.id_user = Int32.Parse(claimIdUser);
         gu.id_group = userInformation.id_group;
@@ -140,9 +149,12 @@
         gu.description_notification = model.description_notification;
         gu.date_notification = model.date_notification.ToUniversalTime().AddDays(1);
         gu.time_notification = model.time_notification;
+        transactionService.AddNewTransaction(gu);
+        var topId = transactionService.showTopIdTransactionUser(userInformation.id_user);
+        log.event_log = "added new transaction. ID: "+topId;
+        logsService.AddNewEvent(log);
         await js.InvokeVoidAsync("alert", "Pomyślnie dodano nową transakcję!");
-        Service.AddNewTransaction(gu);
-        return;
+        navManager.NavigateTo("/listtransaction", true);
     }
     
 }

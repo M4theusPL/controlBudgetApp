@@ -1,7 +1,11 @@
 ﻿@using AplikacjaInzynierska.Authentication
+@using AplikacjaInzynierska.Services;
+@using AplikacjaInzynierska.Data;
 @inherits LayoutComponentBase
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
+@inject LogsService logsService
+@using System.Security.Claims
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -78,6 +82,9 @@
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
@@ -85,6 +92,19 @@
 
     private async Task Logout()
     {
+        var authState = await authenticationState;
+        LogsClass log = new LogsClass();
+
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        var numberIDuser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        log.id_user = Convert.ToInt32(numberIDuser);
+        log.event_log = "successful logout";
+        logsService.AddNewEvent(log);
+
         var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
         await customAuthStateProvider.UpdateAuthenticationState(null);
         navManager.NavigateTo("/", true);
