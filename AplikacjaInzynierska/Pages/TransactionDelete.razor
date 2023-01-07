@@ -4,7 +4,10 @@
 @using AplikacjaInzynierska.Services;
 @inject NavigationManager navManager
 @inject IJSRuntime js
-@inherits OwningComponentBase<TransactionService>
+@inject TransactionService transactionService
+@inject GroupUserService groupUserService
+@inject LogsService logsService
+@using System.Security.Claims
 
 <div class="row justify-content-md-center text-center">
     <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
@@ -18,16 +21,50 @@
     [Parameter]
     public int IdTransaction { get; set; } = 0;
 
-    void DeleteTransaction()
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    LogsClass log = new LogsClass();
+
+    public async Task<bool> DeleteTransaction()
     {
-        Service.DeleteTransaction(IdTransaction);
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = userInformation.id_user;
+
+        transactionService.DeleteTransaction(IdTransaction);
         js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
+
+        log.event_log = "successful delete transaction ID: " + IdTransaction;
+        logsService.AddNewEvent(log);
         navManager.NavigateTo("/listtransaction/", true);
+
+        return true;
     }
 
-    void CancelDeleteTransaction()
+    public async Task<bool> CancelDeleteTransaction()
     {
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = userInformation.id_user;
+
+        log.event_log = "canceled delete transaction ID: " + IdTransaction;
+        logsService.AddNewEvent(log);
+
         navManager.NavigateTo("/transaction/" + IdTransaction, true);
+
+        return true;
     }
 
 }

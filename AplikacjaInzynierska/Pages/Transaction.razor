@@ -6,8 +6,9 @@
 @inject NavigationManager navManager
 @inject IJSRuntime js
 @inject TransactionService transactionService
-@inherits OwningComponentBase<TransactionService>
 @inject GroupUserService groupUserService
+@inject LogsService logsService
+@inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims
 
 <EditForm Model="model">
@@ -114,6 +115,7 @@
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
+    LogsClass log = new LogsClass();
 
     protected override async Task OnInitializedAsync()
     {
@@ -195,10 +197,19 @@
         }
     }
 
-    void EditTransaction()
+    public async Task<bool> EditTransaction()
     {
-
         TransactionsClass gu = new TransactionsClass();
+
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = userInformation.id_user;
 
         gu.id_user_transaction = model.id_user_transaction;
         gu.name_transaction = model.name_transaction;
@@ -210,15 +221,18 @@
         gu.description_notification = model.description_notification;
         gu.date_notification = model.date_notification;
         gu.time_notification = model.time_notification;
-        Service.EditTransaction(gu);
+        transactionService.EditTransaction(gu);
         js.InvokeVoidAsync("alert", "Pomyślny update!");
 
+
+        log.event_log = "successful update transaction ID: " + model.id_user_transaction;
+        logsService.AddNewEvent(log);
+
+        return true;
     }
 
     void DeleteTransaction()
     {
-        //Service.DeleteTransaction(IdTransaction);
-        //js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
         navManager.NavigateTo("/transactiondelete/" + IdTransaction, true);
     }
 }

@@ -6,11 +6,14 @@
 @inject IJSRuntime js
 @inject TransactionService transactionService
 @inject GroupUserService groupUserService
+@inject LogsService logsService
+@inject AuthenticationStateProvider authStateProvider
+@using System.Security.Claims
 
 <div class="row justify-content-md-center text-center">
     <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
         <p class="fs-4 fw-bold">Czy na pewno chcesz usunąć użytkownika z grupy z adresem email: ?</p>
-            <button type="button" class="btn btn-success" @onclick="DeleteTransaction" >Tak</button>
+            <button type="button" class="btn btn-success" @onclick="DeleteUserGroup" >Tak</button>
             <button type="button" class="btn btn-danger" @onclick="CancelDeleteUserGroup" >Nie</button>
     </div>
 </div>
@@ -21,17 +24,50 @@
     [Parameter]
     public int IdGroup { get; set; } = 0;
 
-    void DeleteTransaction()
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    LogsClass log = new LogsClass();
+
+    public async Task<bool> DeleteUserGroup()
     {
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = userInformation.id_user;
+
         groupUserService.RemoveUserGroup(IdUser);
         transactionService.RemoveTransactionsGroup(IdUser);
         js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
-        navManager.NavigateTo("/listtransaction/", true);
+        log.event_log = "successful delete user from group: " + IdGroup + " ID user: " + IdUser;
+        logsService.AddNewEvent(log);
+        navManager.NavigateTo("/groupsettings/", true);
+
+        return true;
     }
 
-    void CancelDeleteUserGroup()
+    public async Task<bool> CancelDeleteUserGroup()
     {
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = userInformation.id_user;
+
+        log.event_log = "canceled delete user from group: " + IdGroup + " ID user: " + IdUser;
+        logsService.AddNewEvent(log);
         navManager.NavigateTo("/groupusersettings/" + IdUser + "/" + IdGroup, true);
+        return true;
     }
 
 }

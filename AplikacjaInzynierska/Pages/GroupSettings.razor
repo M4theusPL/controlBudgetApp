@@ -3,6 +3,7 @@
 @using AplikacjaInzynierska.Services;
 @inject TransactionService transactionService
 @inject GroupUserService groupUserService
+@inject LogsService logsService
 @inject NavigationManager navManager
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
@@ -92,6 +93,7 @@ else
     private Task<AuthenticationState> authenticationState { get; set; }
 
     public System.Collections.Generic.IList<GroupUserClass> sc;
+    LogsClass log = new LogsClass();
 
     protected override async Task OnInitializedAsync()
     {
@@ -121,9 +123,18 @@ else
             var userInformation = groupUserService.GetByUserEmail(claimEmail);
             var id_group = userInformation.id_group;
             var userAccount = groupUserService.GetByUserEmail(model.email);
+
+            var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+            var timeNow = DateTime.Now.ToString("HH:mm:ss");
+            log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+            log.time = TimeOnly.Parse(timeNow);
+
+            log.id_user = userInformation.id_user;
+
             if (userAccount == null)
             {
                 js.InvokeVoidAsync("alert", "Konto pod tym adresem email nie istnieje!");
+                return;
             }
             else
             {
@@ -136,11 +147,16 @@ else
                     groupUserService.AddUserGroup(gu);
                     transactionService.AddTransactionGroup(userAccount.id_user, id_group);
                     js.InvokeVoidAsync("alert", "Pomyślnie dodano użytkownika do grupy!");
+                    log.event_log = "successful added: " + model.email + " in group: " + userAccount.id_group;
+                    logsService.AddNewEvent(log);
                     navManager.NavigateTo("/groupsettings", true);
                 }
                 else
                 {
                     js.InvokeVoidAsync("alert", "Konto pod tym adresem email już jest przypisane do innej grupy!");
+                    log.event_log = "failed added: " + model.email + " in group: " + userAccount.id_group + " the account belongs to a different group";
+                    logsService.AddNewEvent(log);
+                    return;
                 }
             }
             

@@ -5,6 +5,7 @@
 @inherits OwningComponentBase<GroupUserService>
 @inject NavigationManager navManager
 @inject GroupUserService groupUserService
+@inject LogsService logsService
 @inject AuthenticationStateProvider authStateProvider;
 @inject IJSRuntime js
 @using System.Security.Claims
@@ -75,6 +76,7 @@
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
+    LogsClass log = new LogsClass();
 
     protected override async Task OnInitializedAsync()
     {
@@ -141,6 +143,12 @@
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         var userInformation = groupUserService.GetByUserEmail(claimEmail);
 
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = userAccount.id_user;
+
         if (userAccount == null)
         {
             js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
@@ -160,6 +168,9 @@
                     gu.admin_group = permission;
                     Service.EditUserGroup(gu);
                     js.InvokeVoidAsync("alert", "Pomyślny update!");
+                    log.event_log = "successful update account permisions (admin): " + gu.id_user;
+                    logsService.AddNewEvent(log);
+                    return;
                 }
                 else if (permission == "Użytkownik")
                 {
@@ -170,6 +181,9 @@
                     gu.admin_group = permission;
                     Service.EditUserGroup(gu);
                     js.InvokeVoidAsync("alert", "Pomyślny update!");
+                    log.event_log = "successful update account permisions (user): " + gu.id_user;
+                    logsService.AddNewEvent(log);
+                    return;
                 }
             }
             else
@@ -186,6 +200,9 @@
                         gu.admin_group = permission;
                         Service.EditUserGroup(gu);
                         js.InvokeVoidAsync("alert", "Pomyślny update!");
+                        log.event_log = "successful update account permisions (admin): " + gu.id_user;
+                        logsService.AddNewEvent(log);
+                        return;
                     }
                     else if (permission == "Użytkownik")
                     {
@@ -196,11 +213,17 @@
                         gu.admin_group = permission;
                         Service.EditUserGroup(gu);
                         js.InvokeVoidAsync("alert", "Pomyślny update!");
+                        log.event_log = "successful update account permisions (admin): " + gu.id_user;
+                        logsService.AddNewEvent(log);
+                        return;
                     }
                 }
                 else
                 {
                     js.InvokeVoidAsync("alert", "Nie pomyślny update!");
+                    log.event_log = "failed update account in group: " + model.email;
+                    logsService.AddNewEvent(log);
+                    return;
                 }
 
             }
@@ -210,8 +233,6 @@
 
     void DeleteUser()
     {
-        //Service.DeleteTransaction(IdTransaction);
-        //js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
         navManager.NavigateTo("/userdeletefromgroup/" + IdUser + "/" + IdGroup, true);
     }
 

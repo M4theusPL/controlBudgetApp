@@ -7,6 +7,7 @@
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims;
 @inject GroupUserService groupUserService
+@inject LogsService logsService
 @using Microsoft.JSInterop
 @using iTextSharp.text;
 @using iTextSharp.text.pdf;
@@ -108,6 +109,7 @@ else
     private Task<AuthenticationState> authenticationState { get; set; }
 
     public System.Collections.Generic.IList<TransactionsClass> trans;
+    LogsClass log = new LogsClass();
 
     public async Task<byte[]> PDFGenerate()
     {
@@ -115,11 +117,18 @@ else
         var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         var userInformation = groupUserService.GetByUserEmail(claimEmail);
+
+        var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+        var timeNow = DateTime.Now.ToString("HH:mm:ss");
+        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.time = TimeOnly.Parse(timeNow);
+        log.id_user = Convert.ToInt32(claimIdUser);
+
         using (var stream = new MemoryStream())
         {
             var document = new Document();
             var writer = PdfWriter.GetInstance(document, stream);
-            DateTime dateNow = DateTime.Now.ToUniversalTime();
+            DateTime dateNowPdf = DateTime.Now.ToUniversalTime();
             document.Open();
 
             Paragraph paragraph = new Paragraph("NAZWA APLIKACJI", new Font(Font.HELVETICA, 21, Font.BOLD));
@@ -127,7 +136,7 @@ else
             document.Add(paragraph);
             document.Add(new Paragraph(" "));
 
-            paragraph = new Paragraph("Raport z dnia " + dateNow.ToString("yyyy-MM-dd"), new Font(Font.HELVETICA, 18, Font.BOLD));
+            paragraph = new Paragraph("Raport z dnia " + dateNowPdf.ToString("yyyy-MM-dd"), new Font(Font.HELVETICA, 18, Font.BOLD));
             paragraph.Alignment = Element.ALIGN_CENTER;
             document.Add(paragraph);
             document.Add(new Paragraph(" "));
@@ -165,6 +174,8 @@ else
             var fileBytes = stream.ToArray();
 
             await JSRuntime.InvokeAsync<string>("ShowPDF", Convert.ToBase64String(fileBytes));
+            log.event_log = "created PDF";
+            logsService.AddNewEvent(log);
             return stream.ToArray();
         }
         
