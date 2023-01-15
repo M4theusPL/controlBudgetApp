@@ -6,10 +6,13 @@
 @inject NavigationManager navManager
 @inject IJSRuntime js
 @inject TransactionService transactionService
-@inject GroupUserService groupUserService
+@inject UsersService userService
 @inject LogsService logsService
+@inject FilesService filesService
 @inject AuthenticationStateProvider authStateProvider
-@using System.Security.Claims
+@using System.Security.Claims;
+
+<PageTitle>controlBudgetApp - Transakcja nr.@model.id_user_transaction</PageTitle>
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -17,6 +20,19 @@
             <p class="fs-4 fw-bold">
                 Transakcja numer: @model.id_user_transaction
             </p>
+
+            @if (showGroup == true)
+            {
+                <div class="input-group mb-3">
+                    <label class="col-sm-5 input-group-text" >Dodane przez</label>
+                    <InputText class="form-control" @bind-Value="@addedBy" ReadOnly="true" />
+                </div>
+            }
+
+            <div class="input-group mb-3">
+                <label class="col-sm-5 input-group-text" >Nazwa transakcji</label>
+                <InputText class="form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
+            </div>
 
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text" >Nazwa transakcji</label>
@@ -50,35 +66,36 @@
             </div>
 
             <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Nazwa powiadomienia</label>
-                <InputText class="form-control" maxlength="40" @bind-Value="model.name_notification" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Treść powiadmienia</label>
-                <InputText class="form-control" maxlength="150" @bind-Value="model.description_notification" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Data powiadomienia</label>
-                <InputDate class="form-control" @bind-Value="model.date_notification" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Godzina powiadomienia</label>
-                <input class="form-control" type="time" @bind="model.time_notification" />
-            </div>
-
+                    <label class="col-sm-5 input-group-text">Załącznik</label>
+                   @* <InputFile OnChange="HandleFileSelected" />*@
             <!-- add file -->
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text">Załącznik</label>
-                <InputFile class="form-control" />
+            @*<InputFile OnChange=""/>*@
+            @*@foreach(var inv in Invs)
+            {
+                        
+                        @*<InputFile OnChange="@(e => HandleFileSelected(e, inv.id_file))" multiple  /> *@
+                            @*<input type="file" onchange="@(e => HandleFileSelected(e, inv.id_file))">*@
+                        @*
+                
+
+                @if (inv.attachment != null)
+                {
+                    <button @onclick="@(e=>DownloadPdf(inv.id_file))">pobierz</button>
+                    <button @onclick="@(e=>DeletePdf(inv.id_file))">usun</button>
+                }
+                
+            }*@
             </div>
+            
 
             <div>
                 <button type="button" class="btn btn-success" @onclick="EditTransaction" >Edytuj transakcję</button>
                 <button type="button" class="btn btn-danger" @onclick="DeleteTransaction" >Usuń transakcję</button>
             </div>
+
+            <br /><br />
+
+            @*<a href="@fileDownloadUrl" download="@fileName">Download</a>*@
 
         </div>
     </div>
@@ -92,6 +109,9 @@
 
     Model model = new Model();
 
+    public string addedBy = "";
+    public bool showGroup = false;
+
     class Model
     {
         public ListTransactions ListTransactions { get; set; }
@@ -100,10 +120,6 @@
         public string? description { get; set; }
         public double amount { get; set; }
         public DateTime date_transaction { get; set; }
-        public string? name_notification { get; set; }
-        public string? description_notification { get; set; }
-        public DateTime date_notification { get; set; }
-        public TimeOnly time_notification { get; set; }
     }
 
     enum ListTransactions
@@ -116,13 +132,42 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
     LogsClass log = new LogsClass();
+    FilesClass filee = new FilesClass();
+
+    private FilesClass _selectedFile;
+
+    //private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    //{
+    //    var file = e.File;
+    //    using (var stream = file.OpenReadStream())
+    //    {
+    //        var fileContent = new byte[file.Size];
+    //        await stream.ReadAsync(fileContent, 0, (int)file.Size);
+    //        Console.WriteLine(System.Text.Encoding.UTF8.GetString(fileContent));
+    //        _selectedFile = new FilesClass
+    //            {
+    //                filename = file.Name,
+    //                filesize = file.Size,
+    //                id_user = 1,
+    //                id_user_transaction = 1,
+    //                attachment = fileContent
+    //            };
+    //    }
+    //}
+
+    //private string fileDownloadUrl;
+    //private string fileName;
+    //[Inject]
+    //private NavigationManager NavigationManager { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
         var transactionInformation = transactionService.GetByTransaction(IdTransaction);
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
+        var fileInformation = filesService.GetByFile(7);
 
         if (transactionInformation == null)
         {
@@ -131,13 +176,10 @@
             model.description = "";
             model.amount = 0.00;
             model.date_transaction = DateTime.Now.ToUniversalTime();
-            model.name_notification = "";
-            model.description_notification = "";
-            model.date_notification = DateTime.Now.ToUniversalTime();
         }
         else
         {
-            if (transactionInformation.id_user == userInformation.id_user)
+            if (transactionInformation.id_user == userInformation.id_user && transactionInformation.id_group == userInformation.id_group && transactionInformation.id_group != 0)
             {
                 model.id_user_transaction = transactionInformation.id_user_transaction;
                 model.name_transaction = transactionInformation.name_transaction;
@@ -146,10 +188,26 @@
                 model.date_transaction = transactionInformation.date_transaction;
                 string type_transaction = transactionInformation.type_transaction;
                 model.ListTransactions = (ListTransactions)Enum.Parse(typeof(ListTransactions), type_transaction);
-                model.name_notification = transactionInformation.name_notification;
-                model.description_notification = transactionInformation.description_notification;
-                model.date_notification = transactionInformation.date_notification;
-                model.time_notification = transactionInformation.time_notification;
+
+                var userAdded = userService.GetByUserIdGroup(transactionInformation.id_user);
+                addedBy = userAdded.email;
+                showGroup = true;
+            }
+            else if (transactionInformation.id_user == userInformation.id_user)
+            {
+                model.id_user_transaction = transactionInformation.id_user_transaction;
+                model.name_transaction = transactionInformation.name_transaction;
+                model.description = transactionInformation.description;
+                model.amount = transactionInformation.amount;
+                model.date_transaction = transactionInformation.date_transaction;
+                string type_transaction = transactionInformation.type_transaction;
+                model.ListTransactions = (ListTransactions)Enum.Parse(typeof(ListTransactions), type_transaction);
+
+                //if (filee != null && filee.attachment != null)
+                //{
+                //    fileDownloadUrl = "data:application/octet-stream;base64," + Convert.ToBase64String(filee.attachment);
+                //    fileName = filee.filename;
+                //}
             }
             else
             {
@@ -160,9 +218,6 @@
                     model.description = "";
                     model.amount = 0.00;
                     model.date_transaction = DateTime.Now.ToUniversalTime();
-                    model.name_notification = "";
-                    model.description_notification = "";
-                    model.date_notification = DateTime.Now.ToUniversalTime();
                 }
                 else
                 {
@@ -175,10 +230,17 @@
                         model.date_transaction = transactionInformation.date_transaction;
                         string type_transaction = transactionInformation.type_transaction;
                         model.ListTransactions = (ListTransactions)Enum.Parse(typeof(ListTransactions), type_transaction);
-                        model.name_notification = transactionInformation.name_notification;
-                        model.description_notification = transactionInformation.description_notification;
-                        model.date_notification = transactionInformation.date_notification;
-                        model.time_notification = transactionInformation.time_notification;
+
+                        var userAdded = userService.GetByUserIdGroup(transactionInformation.id_user);
+                        addedBy = userAdded.email;
+                        showGroup = true; 
+
+                        //if (filee != null)
+                        //{
+                        //    fileDownloadUrl = "data:application/octet-stream;base64," + Convert.ToBase64String(filee.attachment);
+                        //    fileName = filee.filename;
+                        //}
+
                     }
                     else
                     {
@@ -187,9 +249,6 @@
                         model.description = "";
                         model.amount = 0.00;
                         model.date_transaction = DateTime.Now.ToUniversalTime();
-                        model.name_notification = "";
-                        model.description_notification = "";
-                        model.date_notification = DateTime.Now.ToUniversalTime();
                     }
 
                 }
@@ -203,7 +262,7 @@
 
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
@@ -217,11 +276,14 @@
         gu.amount = model.amount;
         gu.date_transaction = model.date_transaction;
         gu.type_transaction = model.ListTransactions.ToString();
-        gu.name_notification = model.name_notification;
-        gu.description_notification = model.description_notification;
-        gu.date_notification = model.date_notification;
-        gu.time_notification = model.time_notification;
         transactionService.EditTransaction(gu);
+
+        //if (_selectedFile != null)
+        //{
+        //    await filesService.AddNewFile(_selectedFile);
+        //}
+
+
         js.InvokeVoidAsync("alert", "Pomyślny update!");
 
 
@@ -233,6 +295,7 @@
 
     void DeleteTransaction()
     {
+
         navManager.NavigateTo("/transactiondelete/" + IdTransaction, true);
     }
 }

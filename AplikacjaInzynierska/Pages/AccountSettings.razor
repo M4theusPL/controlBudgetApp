@@ -2,13 +2,16 @@
 @using AplikacjaInzynierska.Authentication
 @using AplikacjaInzynierska.Services
 @using AplikacjaInzynierska.Data
-@inject GroupUserService groupUserService
+@attribute [Authorize(Roles = "Admin, User")]
+@inject UsersService userService
 @inject LogsService logsService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims
 @inject NavigationManager navManager
 @using System.Security.Cryptography;
+
+<PageTitle>controlBudgetApp - Ustawienia konta</PageTitle>
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -51,22 +54,9 @@
                 <InputDate class="form-control" @bind-Value="model.date_birthday" />
             </div>
 
-            <!-- add file -->
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text">Zdjęcie profilowe</label>
-                <InputFile class="form-control" />
-            </div>
-
              <button type="button" class="btn btn-success" @onclick="Authenticate">Zapisz</button>
         </div>
     </div>
-    
-    @*<p>
-        <img src="images/user.jpg" zdjecie"/>
-        <InputFile/>
-    </p>
-
-    <button>Edytuj dane</button>*@
 </EditForm>
 
 @code {
@@ -87,14 +77,14 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    public System.Collections.Generic.IList<GroupUserClass> userr;
+    public System.Collections.Generic.IList<UsersClass> userr;
     LogsClass log = new LogsClass();
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         model.name = userInformation.name;
         model.surname = userInformation.surname;
@@ -102,55 +92,63 @@
         model.date_birthday = userInformation.date_birthday;
     }
 
-    void Authenticate()
+    async Task Authenticate()
     {
-        var userAccount = groupUserService.GetByUserEmail(model.email);
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = userService.GetByUserEmail(claimEmail);
+        var checkEmail = userService.CheckEmail(model.email);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
 
         log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
         log.time = TimeOnly.Parse(timeNow);
-        log.id_user = userAccount.id_user;
+        log.id_user = userInformation.id_user;
 
-            if (userAccount == null)
+        if (checkEmail == null)
+        {
+            log.event_log = "failed update account. there is an account with the address: " + model.email;
+            logsService.AddNewEvent(log);
+            log = new LogsClass();
+            js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
+        }
+        else if (checkEmail == true && userInformation.email != model.email)
+        {
+            log.event_log = "failed update account. there is an account with the address: " + model.email;
+            logsService.AddNewEvent(log);
+            log = new LogsClass();
+            js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
+        }
+        else
+        {
+            if (model.password == "")
             {
-                log.event_log = "failed update account. there is an account with the address: " + model.email;
+                UsersClass uc = new UsersClass();
+                uc.name = model.name;
+                uc.surname = model.surname;
+                uc.date_birthday = model.date_birthday.ToUniversalTime();
+                uc.email = model.email;
+                string newpassword = null;
+
+                userService.EditUser(uc, userInformation.id_user, newpassword);
+                log.event_log = "successful update account without password";
                 logsService.AddNewEvent(log);
-                js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
+                log = new LogsClass();
+                js.InvokeVoidAsync("alert", "Pomyślna aktualizacja konta!");
             }
             else
             {
-                
-
-                if (model.password == "")
-                {
-                    GroupUserClass gu = new GroupUserClass();
-
-                    gu.name = model.name;
-                    gu.surname = model.surname;
-                    gu.date_birthday = model.date_birthday;
-                    gu.email = model.email;
-                    string newpassword = null;
-
-                    groupUserService.EditUser(gu, newpassword);
-                    log.event_log = "successful update account without password";
-                    logsService.AddNewEvent(log);
-                    js.InvokeVoidAsync("alert", "Pomyślny update!");
-                    return;
-                }
-                else
-                {
                     var sha256 = SHA256.Create();
                     var passwordBytes = System.Text.Encoding.UTF8.GetBytes(model.password);
                     var passwordHash = sha256.ComputeHash(passwordBytes);
                     string passwordHashed = BitConverter.ToString(passwordHash).Replace("-", "").ToLower();
 
-                    if (passwordHashed == userAccount.password)
+                    if (passwordHashed == userInformation.password)
                     {
                         if ((model.newpassword != "") && (model.newpassword == model.repeatpassword))
                         {
-                            GroupUserClass gu = new GroupUserClass();
+                            UsersClass gu = new UsersClass();
 
                             var newPasswordBytes = System.Text.Encoding.UTF8.GetBytes(model.newpassword);
                             var newPasswordHash = sha256.ComputeHash(newPasswordBytes);
@@ -163,7 +161,7 @@
                             gu.password = passwordHashed;
                             string newpassword = newPasswordHashed;
 
-                            groupUserService.EditUser(gu, newpassword);
+                        userService.EditUser(gu, userInformation.id_user, newpassword);
                             model.password = "";
                             model.newpassword = "";
                             model.repeatpassword = "";
@@ -171,9 +169,12 @@
                             
                             log.event_log = "successful update account with password";
                             logsService.AddNewEvent(log);
-
-                            js.InvokeVoidAsync("alert", "Pomyślny update z hasłem!");
-                            return;
+                        log = new LogsClass();
+                            js.InvokeVoidAsync("alert", "Pomyślna aktualizacja konta!");
+                            js.InvokeVoidAsync("alert", "Proszę o zalogowanie się ponownie.");
+                            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+                            await customAuthStateProvider.UpdateAuthenticationState(null);
+                            navManager.NavigateTo("/login", true);
                         }
                         else
                         {
@@ -182,8 +183,9 @@
                             model.newpassword = "";
                             model.repeatpassword = "";
                             log.event_log = "failed update account with password";
+                        
                             logsService.AddNewEvent(log);
-                            return;
+                        log = new LogsClass();
                         }
                         
                     }
@@ -194,10 +196,18 @@
                         model.newpassword = "";
                         model.repeatpassword = "";
                         log.event_log = "failed update account with password";
+                   
                         logsService.AddNewEvent(log);
-                        return;
+                    log = new LogsClass();
                     }
                 }
+            if (claimEmail != model.email)
+            {
+                js.InvokeVoidAsync("alert", "Proszę o zalogowanie się ponownie.");
+                var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+                await customAuthStateProvider.UpdateAuthenticationState(null);
+                navManager.NavigateTo("/login", true);
+            }
         }
         
     }

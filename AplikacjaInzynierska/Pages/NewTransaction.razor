@@ -4,20 +4,14 @@
 @using AplikacjaInzynierska.Data
 @attribute [Authorize(Roles = "Admin, User")]
 @inject TransactionService transactionService
-@inject GroupUserService groupUserService
+@inject UsersService groupUserService
 @inject LogsService logsService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
 @using System.Security.Claims
 
-<datalist id="type_transaction">
-    <option value="wydatek"></option>
-    <option value="inwestycja"></option>
-    <option value="przychód"></option>
-</datalist>
-
-
+<PageTitle>controlBudgetApp - Nowa transakcja</PageTitle>
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -57,26 +51,6 @@
                 </InputSelect>
             </div>
     
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Nazwa powiadomienia</label>
-                <InputText class="form-control" maxlength="40" @bind-Value="model.name_notification" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Treść powiadmienia</label>
-                <InputText class="form-control" maxlength="150" @bind-Value="model.description_notification" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Data powiadomienia</label>
-                <InputDate class="form-control" @bind-Value="model.date_notification" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Godzina powiadomienia</label>
-                <input class="form-control" type="time" @bind="model.time_notification" />
-            </div>
-    
             <!-- add file -->
             <div class="input-group mb-3">
                 <label class="col-sm-5 input-group-text">Załącznik</label>
@@ -104,10 +78,6 @@
         public string? description { get; set; } = "";
         public double amount { get; set; } = 0.00;
         public DateTime date_transaction { get; set; } = DateTime.Now.ToUniversalTime();
-        public string? name_notification { get; set; } = "";
-        public string? description_notification { get; set; } = "";
-        public DateTime date_notification { get; set; } = DateTime.Now.ToUniversalTime();
-        public TimeOnly time_notification { get; set; }
     }
 
     enum ListTransactions
@@ -145,10 +115,6 @@
         gu.amount = model.amount;
         gu.date_transaction = model.date_transaction.ToUniversalTime().AddDays(1);
         gu.type_transaction = model.ListTransactions.ToString();
-        gu.name_notification = model.name_notification;
-        gu.description_notification = model.description_notification;
-        gu.date_notification = model.date_notification.ToUniversalTime().AddDays(1);
-        gu.time_notification = model.time_notification;
         transactionService.AddNewTransaction(gu);
         var topId = transactionService.showTopIdTransactionUser(userInformation.id_user);
         log.event_log = "added new transaction. ID: "+topId;

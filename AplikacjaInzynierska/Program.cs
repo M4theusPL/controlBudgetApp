@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 using AplikacjaInzynierska.Services;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Myconnection");
@@ -17,9 +18,16 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-builder.Services.AddScoped<GroupUserService>();
+builder.Services.AddScoped<UsersService>();
+builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<LogsService>();
+builder.Services.AddScoped<FilesService>();
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["CustomBudgetApp:blob"], preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["CustomBudgetApp:queue"], preferMsi: true);
+});
 
 var app = builder.Build();
 

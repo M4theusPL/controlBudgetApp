@@ -7,81 +7,81 @@ using System.Security.Cryptography;
 
 namespace AplikacjaInzynierska.Services
 {
-    public class GroupUserService
+    public class UsersService
     {
         protected readonly ApplicationDbContext _dbcontext;
 
-        public GroupUserService(ApplicationDbContext _db)
+        public UsersService(ApplicationDbContext _db)
         {
             _dbcontext = _db;
         }
 
-        public List<GroupUserClass> displayuser()
+        public List<UsersClass> displayuser()
         {
             return _dbcontext.users.ToList();
         }
         
-        public List<GroupUserClass> displayUsersGroup(int Id)
+        public List<UsersClass> displayUsersGroup(int Id)
         {
             return _dbcontext.users.Where(x => x.id_group == Id).ToList();
         }
 
-        public GroupUserClass? GetByUserEmail(string email)
+        public UsersClass? GetByUserEmail(string email)
         {
             return _dbcontext.users.FirstOrDefault(x => x.email == email);
         }
 
-        public GroupUserClass? GetByUserIdUser(int id_user)
+        public UsersClass? GetByUserIdUser(int id_user)
         {
             return _dbcontext.users.FirstOrDefault(x => x.id_user == id_user);
         }
-        public async Task<GroupUserClass> GetByUserAsync(int Id)
+
+        public async Task<UsersClass> GetByUserAsync(int Id)
         {
-            GroupUserClass employee = await _dbcontext.users.FirstOrDefaultAsync(c => c.id_user.Equals(Id));
+            UsersClass employee = await _dbcontext.users.FirstOrDefaultAsync(c => c.id_user.Equals(Id));
             return employee;
         }
 
-        public GroupUserClass? GetByUserIdGroup(int id_group)
+        public UsersClass? GetByUserIdGroup(int id_group)
         {
             return _dbcontext.users.FirstOrDefault(x => x.id_group == id_group);
         }
 
-        public bool AddNewUser(GroupUserClass gc)
+        public bool AddNewUser(UsersClass gc)
         {
             _dbcontext.users.Add(gc);
             _dbcontext.SaveChanges();
             return true;
         }
 
-        public bool EditUser(GroupUserClass gc, string newpassword)
+        public bool EditUser(UsersClass uc, int id_user, string newpassword)
         {
-            var up = _dbcontext.users.Where(u => u.email == gc.email).First();
-            if (up != null)
+            var checkUser = _dbcontext.users.Where(u => u.id_user == id_user).First();
+            if (checkUser != null)
             {
                 if(newpassword == null)
                 {
-                    up.email = gc.email;
-                    up.name = gc.name;
-                    up.surname = gc.surname;
-                    up.date_birthday = gc.date_birthday.ToUniversalTime().AddDays(1);
-                    up.password = up.password;
-                    _dbcontext.users.Update(up);
+                    checkUser.email = uc.email;
+                    checkUser.name = uc.name;
+                    checkUser.surname = uc.surname;
+                    checkUser.date_birthday = uc.date_birthday.ToUniversalTime().AddDays(1);
+                    checkUser.password = checkUser.password;
+                    _dbcontext.users.Update(checkUser);
                     _dbcontext.SaveChanges();
                     return true;
                 }
                 else
                 {
-                    var upp = _dbcontext.users.Where(u => u.email == gc.email && u.password == gc.password).First();
-                    upp.email = gc.email;
-                    upp.name = gc.name;
-                    upp.surname = gc.surname;
-                    upp.date_birthday = gc.date_birthday.ToUniversalTime().AddDays(1);
-                    upp.password = newpassword;
-                    _dbcontext.users.Update(upp);
+                    var checkUserWithPassword = _dbcontext.users.Where(u => u.id_user == id_user && u.password == uc.password).First();
+                    checkUserWithPassword.email = uc.email;
+                    checkUserWithPassword.name = uc.name;
+                    checkUserWithPassword.surname = uc.surname;
+                    checkUserWithPassword.date_birthday = uc.date_birthday.ToUniversalTime().AddDays(1);
+                    checkUserWithPassword.password = newpassword;
+                    _dbcontext.users.Update(checkUserWithPassword);
                     _dbcontext.SaveChanges();
                     return true;
                 }
-                
             }
             else
             {
@@ -90,7 +90,7 @@ namespace AplikacjaInzynierska.Services
            
         }
 
-        public bool EditUserGroup(GroupUserClass gc)
+        public bool EditUserGroup(UsersClass gc)
         {
             var up = _dbcontext.users.Where(u => u.email == gc.email).First();
             if (up != null)
@@ -134,12 +134,24 @@ namespace AplikacjaInzynierska.Services
 
         }
 
-        public GroupUserClass? GetByIdGroup(int id_group)
+        public bool CheckEmail(string email)
+        {
+            if (_dbcontext.users.Any(u => u.email == email))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public UsersClass? GetByIdGroup(int id_group)
         {
             return _dbcontext.users.FirstOrDefault(x => x.id_group == id_group);
         }
 
-        public bool AddUserGroup(GroupUserClass gc)
+        public bool AddUserGroup(UsersClass gc)
         {
             var upp = _dbcontext.users.Where(u => u.email == gc.email).First();
             if (upp != null)
@@ -148,6 +160,7 @@ namespace AplikacjaInzynierska.Services
                 upp.email = gc.email;
                 upp.id_group = gc.id_group;
                 upp.date_birthday = upp.date_birthday.ToUniversalTime();
+                upp.admin_group = gc.admin_group;
                 _dbcontext.users.Update(upp);
                 _dbcontext.SaveChanges();
                 return true;
@@ -157,6 +170,18 @@ namespace AplikacjaInzynierska.Services
                 return false;
             }
 
+        }
+
+        public async Task<int> ilejestwgrupie(int id_group)
+        {
+            int upp = _dbcontext.users.Where(u => u.id_group == id_group).Count();
+            return upp;
+        }
+
+        public async Task<int> ilejestwgrupieadminow(int id_group)
+        {
+            int upp = _dbcontext.users.Where(u => u.id_group == id_group && u.admin_group == "Admin").Count();
+            return upp;
         }
     }
 }

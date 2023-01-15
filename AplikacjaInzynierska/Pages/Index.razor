@@ -3,7 +3,7 @@
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
 @inject TransactionService transactionService
-@inject GroupUserService groupUserService
+@inject UsersService groupUserService
 @inherits OwningComponentBase<TransactionService>
 @inject IJSRuntime js;
 @inject AuthenticationStateProvider authStateProvider;
@@ -11,7 +11,7 @@
 @using ChartJs.Blazor;
 @using ChartJs.Blazor.PieChart;
 
-<PageTitle>Strona Główna</PageTitle>
+<PageTitle>controlBudgetApp - Strona Główna</PageTitle>
 
 <AuthorizeView>
     <Authorized>

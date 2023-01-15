@@ -2,12 +2,14 @@
 @using AplikacjaInzynierska.Authentication
 @using AplikacjaInzynierska.Services
 @using AplikacjaInzynierska.Data
-@inject GroupUserService groupUserService
+@inject UsersService groupUserService
 @inject LogsService logsService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navManager
 @using System.Security.Cryptography;
+
+<PageTitle>controlBudgetApp - Rejestracja konta</PageTitle>
 
 <EditForm Model="model" >
     <div class="row justify-content-md-center">
@@ -65,7 +67,7 @@
         public string? repeatpassword { get; set; }
     }
 
-    GroupUserClass gu = new GroupUserClass();
+    UsersClass gu = new UsersClass();
     LogsClass log = new LogsClass();
 
     void Authenticate()

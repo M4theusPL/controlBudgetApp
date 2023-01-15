@@ -2,10 +2,11 @@
 @using AplikacjaInzynierska.Authentication;
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
+@attribute [Authorize(Roles = "Admin, User")]
 @inject NavigationManager navManager
 @inject IJSRuntime js
 @inject TransactionService transactionService
-@inject GroupUserService groupUserService
+@inject UsersService groupUserService
 @inject LogsService logsService
 @using System.Security.Claims
 

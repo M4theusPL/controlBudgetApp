@@ -2,14 +2,16 @@
 @using AplikacjaInzynierska.Authentication;
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
-@inherits OwningComponentBase<GroupUserService>
+@attribute [Authorize(Roles = "Admin, User")]
+@inherits OwningComponentBase<UsersService>
 @inject NavigationManager navManager
-@inject GroupUserService groupUserService
+@inject UsersService userService
 @inject LogsService logsService
 @inject AuthenticationStateProvider authStateProvider;
 @inject IJSRuntime js
 @using System.Security.Claims
 
+<PageTitle>controlBudgetApp - Ustawienia grupy</PageTitle>
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
@@ -34,7 +36,7 @@
             </div>
 
             <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Typ</label>
+                <label class="col-sm-5 input-group-text" >Rola</label>
                 <InputSelect class="form-select" @bind-Value="model.PermissionList" >
                     @foreach (var Permission in Enum.GetValues(typeof(PermissionList)))
                     {
@@ -47,7 +49,6 @@
                 <button type="button" class="btn btn-success" @onclick="UpdateUser" >Edytuj użytkownika</button>
                 <button type="button" class="btn btn-danger" @onclick="DeleteUser" >Usuń z grupy</button>
             </div>
-
         </div>
     </div>
 </EditForm>
@@ -82,7 +83,7 @@
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         if (IdUser == userInformation.id_user)
         {
@@ -108,7 +109,7 @@
         {
             if (IdGroup == userInformation.id_group)
             {
-                userInformation = groupUserService.GetByUserIdUser(IdUser);
+                userInformation = userService.GetByUserIdUser(IdUser);
                 var permission = userInformation.admin_group;
                 if (permission == "Admin")
                 {
@@ -138,10 +139,10 @@
 
     async Task UpdateUser()
     {
-        var userAccount = groupUserService.GetByUserEmail(model.email);
+        var userAccount = userService.GetByUserEmail(model.email);
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
@@ -155,7 +156,7 @@
         }
         else
         {
-            GroupUserClass gu = new GroupUserClass();
+            UsersClass gu = new UsersClass();
             if (IdUser == userInformation.id_user)
             {
                 var permission = model.PermissionList.ToString();
@@ -231,9 +232,32 @@
 
     }
 
-    void DeleteUser()
+    async Task DeleteUser()
     {
-        navManager.NavigateTo("/userdeletefromgroup/" + IdUser + "/" + IdGroup, true);
-    }
+        var authState = await authenticationState;
+        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var userInformation = userService.GetByUserEmail(claimEmail);
+        int ilewgrupie = await userService.ilejestwgrupie(userInformation.id_group);
+        int ilewgrupieadminow = await userService.ilejestwgrupieadminow(userInformation.id_group);
 
+        if (ilewgrupie >= 2)
+        {
+            if (ilewgrupieadminow >= 2)
+            {
+                navManager.NavigateTo("/userdeletefromgroup/" + IdUser + "/" + IdGroup, true);
+            }
+            else if (ilewgrupieadminow == 1 && userInformation.id_group != IdUser)
+            {
+                navManager.NavigateTo("/userdeletefromgroup/" + IdUser + "/" + IdGroup, true);
+            }
+            else
+            {
+                js.InvokeVoidAsync("alert", "Jesteś jedynym administratorem w grupie. Istnieją w niej również inni użytkownicy. Aby usunąć grupę, usuń resztę użytkowników. W przypadku usunięcia tylko siebie z grupy, przydziel rolę „Administratora” innemu użytkownikowi w grupie.");
+            }
+        }
+        else
+        {
+            navManager.NavigateTo("/groupdeletion/" + IdGroup, true);
+        }
+    }
 }

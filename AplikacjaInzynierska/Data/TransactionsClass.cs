@@ -12,10 +12,6 @@ namespace AplikacjaInzynierska.Data
         public double amount { get; set; }
         public DateTime date_transaction { get; set; }
         public string type_transaction { get; set; }
-        public string name_notification { get; set; }
-        public string description_notification { get; set; }
-        public DateTime date_notification { get; set; }
-        public TimeOnly time_notification { get; set; }
         public int id_group { get; set; }
     }
 }

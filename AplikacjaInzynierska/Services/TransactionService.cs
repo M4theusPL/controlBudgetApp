@@ -47,17 +47,64 @@ namespace AplikacjaInzynierska.Services
             return transactionsGroup;
         }
 
-        public List<TransactionsClass> displayGroupSearchTransaction(int id_group, string searchedText, int sorting)
+        public List<TransactionsClass> displaySearchTransaction(int id_user, string searchedText, int selectedValue)
+        {
+            var transactionsGroup = _dbcontext.transactions.Where(x => x.id_user == id_user
+            && (EF.Functions.Like(x.name_transaction, $"%{searchedText}%")
+            || EF.Functions.Like(x.description, $"%{searchedText}%")
+            || EF.Functions.Like((string?)Convert.ToString(x.amount), $"%{searchedText}%")
+            || EF.Functions.Like((string?)(object)x.date_transaction, $"%{searchedText}%")
+            || EF.Functions.Like((string?)Convert.ToString(x.id_user_transaction), $"%{searchedText}%"))
+            );
+
+            switch (selectedValue)
+            {
+                case 1:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.id_user_transaction);
+                    break;
+                case 2:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.id_user_transaction);
+                    break;
+                case 3:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.name_transaction);
+                    break;
+                case 4:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.name_transaction);
+                    break;
+                case 5:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.description);
+                    break;
+                case 6:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.description);
+                    break;
+                case 7:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.amount);
+                    break;
+                case 8:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.amount);
+                    break;
+                case 9:
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.date_transaction);
+                    break;
+                case 10:
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.date_transaction);
+                    break;
+            }
+
+            return transactionsGroup.ToList();
+        }
+
+        public List<TransactionsClass> displayGroupSearchTransaction(int id_group, string searchedText, int selectedValue)
         {
             var transactionsGroup = _dbcontext.transactions.Where(x => x.id_group == id_group
-            && EF.Functions.Like(x.name_transaction, $"%{searchedText}%")
+            && (EF.Functions.Like(x.name_transaction, $"%{searchedText}%")
             || EF.Functions.Like(x.description, $"%{searchedText}%")
             || EF.Functions.Like((string?) Convert.ToString(x.amount), $"%{searchedText}%")
             || EF.Functions.Like((string?) (object) x.date_transaction, $"%{searchedText}%")
-            || EF.Functions.Like((string?) Convert.ToString(x.id_user_transaction), $"%{searchedText}%")
+            || EF.Functions.Like((string?) Convert.ToString(x.id_user_transaction), $"%{searchedText}%"))
             );
 
-            switch (sorting)
+            switch (selectedValue)
             {
                 case 1:
                     transactionsGroup = transactionsGroup.OrderBy(x => x.id_user_transaction);
@@ -219,10 +266,6 @@ namespace AplikacjaInzynierska.Services
                 up.amount = gc.amount;
                 up.date_transaction = gc.date_transaction.ToUniversalTime().AddDays(1);
                 up.type_transaction = gc.type_transaction;
-                up.name_notification = gc.name_notification;
-                up.description_notification = gc.description_notification;
-                up.date_notification = gc.date_notification.ToUniversalTime().AddDays(1);
-                up.time_notification = gc.time_notification;
 
                 _dbcontext.transactions.Update(up);
                 _dbcontext.SaveChanges();
@@ -244,7 +287,6 @@ namespace AplikacjaInzynierska.Services
                 {
                     xr.id_user = id_user;
                     xr.id_group = 0;
-                    xr.date_notification = xr.date_notification.ToUniversalTime().AddDays(1);
                     xr.date_transaction = xr.date_transaction.ToUniversalTime().AddDays(1);
                     _dbcontext.transactions.Update(xr);
                 }
@@ -269,7 +311,6 @@ namespace AplikacjaInzynierska.Services
                 {
                     xr.id_user = id_user;
                     xr.id_group = id_group;
-                    xr.date_notification = xr.date_notification.ToUniversalTime().AddDays(1);
                     xr.date_transaction = xr.date_transaction.ToUniversalTime().AddDays(1);
                     _dbcontext.transactions.Update(xr);
                 }

@@ -2,7 +2,7 @@
 
 namespace AplikacjaInzynierska.Data
 {
-    public class GroupUserClass
+    public class UsersClass
     {
         [Key]
         public int id_user { get; set; }

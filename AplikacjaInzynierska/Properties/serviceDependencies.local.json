@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "secrets1": {
+      "type": "secrets.user"
+    },
+    "storage1": {
+      "secretStore": "LocalSecretsFile",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/aplikacjainzynierskastor",
+      "type": "storage.azure",
+      "connectionId": "CustomBudgetApp",
+      "dynamicId": null
+    }
+  }
+}

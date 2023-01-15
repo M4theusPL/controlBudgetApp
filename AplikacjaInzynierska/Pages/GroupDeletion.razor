@@ -1,12 +1,13 @@
-﻿@page "/userdeletefromgroup/{idUser:int}/{idGroup:int}";
+﻿@page "/groupdeletion/{idGroup:int}";
 @using AplikacjaInzynierska.Authentication;
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
-@attribute [Authorize(Roles = "Admin, User")]
+@attribute [Authorize(Roles = "Admin")]
 @inject NavigationManager navManager
 @inject IJSRuntime js
 @inject TransactionService transactionService
-@inject UsersService groupUserService
+@inject UsersService userService
+@inject GroupService groupService
 @inject LogsService logsService
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims
@@ -15,9 +16,9 @@
 {
     <div class="row justify-content-md-center text-center">
         <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
-            <p class="fs-4 fw-bold">Czy na pewno chcesz usunąć użytkownika z grupy z adresem email: @deleteEmailUser ?</p>
-                <button type="button" class="btn btn-success" @onclick="DeleteUserGroup" >Tak</button>
-                <button type="button" class="btn btn-danger" @onclick="CancelDeleteUserGroup" >Nie</button>
+            <p class="fs-4 fw-bold">Czy na pewno chcesz usunąć grupę: @nameGroupDisplay?</p>
+                <button type="button" class="btn btn-success" @onclick="DeleteGroup" >Tak</button>
+                <button type="button" class="btn btn-danger" @onclick="CancelDeleteGroup" >Nie</button>
         </div>
     </div>
 }
@@ -31,14 +32,11 @@ else
     </div>
 }
 
-
 @code {
-    [Parameter]
-    public int IdUser { get; set; } = 0;
     [Parameter]
     public int IdGroup { get; set; } = 0;
 
-    public string deleteEmailUser = "";
+    public string nameGroupDisplay = "";
     private bool check = false;
 
     [CascadingParameter]
@@ -50,82 +48,76 @@ else
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
-        var deleteIdUser = groupUserService.GetByUserIdUser(IdUser);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
         log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
         log.time = TimeOnly.Parse(timeNow);
         log.id_user = userInformation.id_user;
-        log.event_log = "tried to load another group to delete the user: " + IdGroup;
+        log.event_log = "tried to load another group for deletion: " + IdGroup;
 
         if (IdGroup == 0)
         {
             check = false;
             logsService.AddNewEvent(log);
         }
-        else if (deleteIdUser == null)
+        else if (userInformation == null)
         {
             check = false;
             logsService.AddNewEvent(log);
         }
-        else if (userInformation.id_group != IdGroup || deleteIdUser.id_group != IdGroup)
+        else if (userInformation.id_group != IdGroup)
         {
             check = false;
             logsService.AddNewEvent(log);
         }
         else
         {
-            log.event_log = "successful load user from group: " + IdGroup + " ID user: " + IdUser;
+            var nameGroup = groupService.GetGroupName(Convert.ToInt32(IdGroup));
+            nameGroupDisplay = nameGroup.name_group;
+
+            log.event_log = "successful load user from group: " + IdGroup;
             logsService.AddNewEvent(log);
             check = true;
-            deleteEmailUser = deleteIdUser.email;
             log = new LogsClass();
         }
     }
 
-    public async Task<bool> DeleteUserGroup()
+    public async Task<bool> DeleteGroup()
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
-        var deleteIdUser = groupUserService.GetByUserIdUser(IdUser);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
-        if(deleteIdUser.id_group == userInformation.id_group)
+        if (userInformation.id_group == IdGroup)
         {
-            if (userInformation.id_group == IdGroup)
-            {
-                var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
-                var timeNow = DateTime.Now.ToString("HH:mm:ss");
-                log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
-                log.time = TimeOnly.Parse(timeNow);
-                log.id_user = userInformation.id_user;
+            var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+            var timeNow = DateTime.Now.ToString("HH:mm:ss");
+            log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+            log.time = TimeOnly.Parse(timeNow);
+            log.id_user = userInformation.id_user;
 
-                groupUserService.RemoveUserGroup(IdUser);
-                transactionService.RemoveTransactionsGroup(IdUser);
-                log.event_log = "successful delete user from group: " + IdGroup + " ID user: " + IdUser;
-                logsService.AddNewEvent(log);
-                js.InvokeVoidAsync("alert", "Pomyślne usunięcie!");
-                navManager.NavigateTo("/groupsettings/", true);
-            }
-            else
-            {
-                navManager.NavigateTo("/", true);
-            }
+            groupService.DeleteGroup(userInformation.id_group);
+            userService.RemoveUserGroup(userInformation.id_user);
+            transactionService.RemoveTransactionsGroup(userInformation.id_user);
+            log.event_log = "successful delete group: " + IdGroup;
+            logsService.AddNewEvent(log);
+            js.InvokeVoidAsync("alert", "Pomyślne usunięcie grupy!");
+            navManager.NavigateTo("/groupsettings/", true);
         }
         else
         {
-            navManager.NavigateTo("/", true);
+            check = false;
         }
         return true;
     }
 
-    public async Task<bool> CancelDeleteUserGroup()
+    public async Task<bool> CancelDeleteGroup()
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
@@ -133,10 +125,9 @@ else
         log.time = TimeOnly.Parse(timeNow);
         log.id_user = userInformation.id_user;
 
-        log.event_log = "canceled delete user from group: " + IdGroup + " ID user: " + IdUser;
+        log.event_log = "canceled delete group: " + IdGroup;
         logsService.AddNewEvent(log);
-        navManager.NavigateTo("/groupusersettings/" + IdUser + "/" + IdGroup, true);
+        navManager.NavigateTo("/groupsettings/", true);
         return true;
     }
-
 }

@@ -1,13 +1,17 @@
 ﻿@page "/groupsettings"
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
+@attribute [Authorize(Roles = "Admin, User")]
 @inject TransactionService transactionService
-@inject GroupUserService groupUserService
+@inject UsersService usersService
+@inject GroupService groupService
 @inject LogsService logsService
 @inject NavigationManager navManager
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims
+
+<PageTitle>controlBudgetApp - Ustawienia grupy</PageTitle>
 
 @if (sc == null)
 {
@@ -22,17 +26,18 @@
                     <InputText class="form-control" maxlength="40" @bind-Value="model.groupname" />
                 </div>
 
-                <button type="button" class="btn btn-success">Utwórz grupę</button>
+                <button type="button" class="btn btn-success" @onclick="CreateGroup">Utwórz grupę</button>
             </div>
         </div>
     </EditForm>
 }
 else
 {
+    <AuthorizeView Roles="Admin">
         <div class="row justify-content-md-center text-center">
             
             <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
-                    <p class="fs-4 fw-bold">Ustawienia grupy</p>
+                    <p class="fs-4 fw-bold">Ustawienia grupy: @nameGroupDisplay</p>
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr class="fw-bold">
@@ -44,23 +49,23 @@ else
                         </thead>
 
                         <tbody>
-                    @foreach (var item in sc)
-                    {
-                                    <tr>
-                                        <td>@item.email</td>
-                                        <td>@item.name</td>
-                                        <td>@item.surname</td>
-                                        <td>
-                                            <a class="nav-link" href="/groupusersettings/@item.id_user/@item.id_group">
-                                                <span class="material-icons" aria-hidden="true">search</span>
-                                            </a>
-                                        </td>
-                                    </tr>
-                    }
+                            @foreach (var item in sc)
+                            {
+                                <tr>
+                                    <td>@item.email</td>
+                                    <td>@item.name</td>
+                                    <td>@item.surname</td>
+                                    <td>
+                                        <a class="nav-link" href="/groupusersettings/@item.id_user/@item.id_group">
+                                            <span class="material-icons" aria-hidden="true">search</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
 
-                        <EditForm Model="model">
+                        <EditForm Model="model" Context="another_context">
                             <div class="row justify-content-md-center">
                                 <div class="col-5 mb-2 bg-light text-dark text-center rounded">
                                     <p class="fs-4 fw-bold">
@@ -77,7 +82,39 @@ else
                         </EditForm>
             </div>
         </div>
+     </AuthorizeView>
+
+
+     <AuthorizeView Roles="User">
+        <div class="row justify-content-md-center text-center">
+            
+            <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
+                    <p class="fs-4 fw-bold">Lista użytkowników grupy: @nameGroupDisplay</p>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr class="fw-bold">
+                                <td>Email</td>
+                                <td>Imię</td>
+                                <td>Nazwisko</td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in sc)
+                            {
+                                <tr>
+                                    <td>@item.email</td>
+                                    <td>@item.name</td>
+                                    <td>@item.surname</td>
+                                 </tr>
+                            }
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+     </AuthorizeView>
 }
+
 
 @code {
 
@@ -89,20 +126,22 @@ else
         public string? email { get; set; } = "";
     }
 
+    public string nameGroupDisplay = "";
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    public System.Collections.Generic.IList<GroupUserClass> sc;
+    public System.Collections.Generic.IList<UsersClass> sc;
     LogsClass log = new LogsClass();
+    GroupClass gc = new GroupClass();
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = usersService.GetByUserEmail(claimEmail);
         var id_group = userInformation.id_group;
-
 
         if (id_group == 0)
         {
@@ -110,7 +149,44 @@ else
         }
         else
         {
-            sc = groupUserService.displayUsersGroup(id_group);
+            var nameGroup = groupService.GetGroupName(Convert.ToInt32(id_group));
+            nameGroupDisplay = nameGroup.name_group;
+            sc = usersService.displayUsersGroup(id_group);
+        }
+    }
+
+    async Task CreateGroup()
+    {
+        if (model.groupname != "")
+        {
+            var authState = await authenticationState;
+            var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var userInformation = usersService.GetByUserEmail(claimEmail);
+            var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
+            var timeNow = DateTime.Now.ToString("HH:mm:ss");
+            log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+            log.time = TimeOnly.Parse(timeNow);
+            log.id_user = userInformation.id_user;
+            log.event_log = "successful created group: " + model.groupname;
+
+            gc.name_group = model.groupname;
+            int newGroupId = await groupService.AddNewGroup(gc);
+            UsersClass uc = new UsersClass();
+            uc.id_user = userInformation.id_user;
+            uc.email = userInformation.email;
+            uc.id_group = newGroupId;
+            uc.admin_group = "Admin";
+            usersService.AddUserGroup(uc);
+            transactionService.AddTransactionGroup(userInformation.id_user, newGroupId);
+            logsService.AddNewEvent(log);
+            log = new LogsClass();
+            js.InvokeVoidAsync("alert", "Pomyślnie utworzono grupę!");
+            navManager.NavigateTo("/groupsettings", true);
+        }
+        else
+        {
+            js.InvokeVoidAsync("alert", "Nie podano nazwy grupy!");
+            return;
         }
     }
 
@@ -120,9 +196,9 @@ else
         {
             var authState = await authenticationState;
             var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var userInformation = groupUserService.GetByUserEmail(claimEmail);
+            var userInformation = usersService.GetByUserEmail(claimEmail);
             var id_group = userInformation.id_group;
-            var userAccount = groupUserService.GetByUserEmail(model.email);
+            var userAccount = usersService.GetByUserEmail(model.email);
 
             var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
             var timeNow = DateTime.Now.ToString("HH:mm:ss");
@@ -134,27 +210,33 @@ else
             if (userAccount == null)
             {
                 js.InvokeVoidAsync("alert", "Konto pod tym adresem email nie istnieje!");
+                log.event_log = "failed added: " + model.email + " in group: " + userInformation.id_group + " the account doesn't exist";
+                logsService.AddNewEvent(log);
+                log = new LogsClass();
                 return;
             }
             else
             {
                 if (userAccount.id_group == 0)
                 {
-                    GroupUserClass gu = new GroupUserClass();
-                    gu.id_user = userAccount.id_user;
-                    gu.email = userAccount.email;
-                    gu.id_group = id_group;
-                    groupUserService.AddUserGroup(gu);
+                    UsersClass uc = new UsersClass();
+                    uc.id_user = userAccount.id_user;
+                    uc.email = userAccount.email;
+                    uc.id_group = id_group;
+                    uc.admin_group = "User";
+                    usersService.AddUserGroup(uc);
                     transactionService.AddTransactionGroup(userAccount.id_user, id_group);
                     js.InvokeVoidAsync("alert", "Pomyślnie dodano użytkownika do grupy!");
-                    log.event_log = "successful added: " + model.email + " in group: " + userAccount.id_group;
+                    log.event_log = "successful added: " + model.email + " in group: " + userInformation.id_group;
                     logsService.AddNewEvent(log);
+                    log = new LogsClass();
                     navManager.NavigateTo("/groupsettings", true);
                 }
                 else
                 {
                     js.InvokeVoidAsync("alert", "Konto pod tym adresem email już jest przypisane do innej grupy!");
-                    log.event_log = "failed added: " + model.email + " in group: " + userAccount.id_group + " the account belongs to a different group";
+                    log.event_log = "failed added: " + model.email + " in group: " + userInformation.id_group + " the account belongs to a different group";
+                    log = new LogsClass();
                     logsService.AddNewEvent(log);
                     return;
                 }
