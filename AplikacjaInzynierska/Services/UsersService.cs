@@ -90,19 +90,19 @@ namespace AplikacjaInzynierska.Services
            
         }
 
-        public bool EditUserGroup(UsersClass gc)
+        public bool EditUserGroup(UsersClass uc)
         {
-            var up = _dbcontext.users.Where(u => u.email == gc.email).First();
-            if (up != null)
+            var update = _dbcontext.users.Where(u => u.id_user == uc.id_user).First();
+            if (update != null)
             {
-                up.email = gc.email;
-                up.name = gc.name;
-                up.surname = gc.surname;
-                up.password = up.password;
-                up.date_birthday = up.date_birthday.ToUniversalTime().AddDays(1);
-                up.admin_group = gc.admin_group;
-                up.id_group = up.id_group;
-                _dbcontext.users.Update(up);
+                update.email = uc.email;
+                update.name = uc.name;
+                update.surname = uc.surname;
+                update.password = update.password;
+                update.date_birthday = update.date_birthday.ToUniversalTime().AddDays(1);
+                update.admin_group = uc.admin_group;
+                update.id_group = update.id_group;
+                _dbcontext.users.Update(update);
                 _dbcontext.SaveChanges();
                 return true;
             }

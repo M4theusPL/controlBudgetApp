@@ -70,7 +70,7 @@
                 await js.InvokeVoidAsync("alert", "Podano zły login lub hasło!");
 
                 log.id_user = 0;
-                log.event_log = "failed login to: "+userAccount.email;
+                log.event_log = "failed login to: " + model.email;
                 logsService.AddNewEvent(log);
 
                 sha256 = null;

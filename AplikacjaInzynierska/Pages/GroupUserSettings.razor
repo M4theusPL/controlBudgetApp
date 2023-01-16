@@ -3,7 +3,6 @@
 @using AplikacjaInzynierska.Data;
 @using AplikacjaInzynierska.Services;
 @attribute [Authorize(Roles = "Admin, User")]
-@inherits OwningComponentBase<UsersService>
 @inject NavigationManager navManager
 @inject UsersService userService
 @inject LogsService logsService
@@ -139,52 +138,109 @@
 
     async Task UpdateUser()
     {
-        var userAccount = userService.GetByUserEmail(model.email);
+        var checkEmail = userService.CheckEmail(model.email);
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var claimGroup = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var userInformation = userService.GetByUserEmail(claimEmail);
+        var accountUpdate = userService.GetByUserIdUser(IdUser);
 
+        string roleGroup = "";
+
+        switch (Convert.ToInt32(claimGroup))
+        {
+            case 1:
+                roleGroup = "Admin";
+                break;
+            case 2:
+                roleGroup = "User";
+                break;
+        }
+
+        var status = false;
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
         log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
         log.time = TimeOnly.Parse(timeNow);
-        log.id_user = userAccount.id_user;
+        log.id_user = userInformation.id_user;
 
-        if (userAccount == null)
+        if (checkEmail == null)
         {
+            log.event_log = "failed update account. there is an account with the address: " + model.email;
+            logsService.AddNewEvent(log);
+            log = new LogsClass();
+            js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
+        }
+        else if (checkEmail == true && userInformation.email != model.email && accountUpdate.email != model.email)
+        {
+            log.event_log = "failed update account. there is an account with the address: " + model.email;
+            logsService.AddNewEvent(log);
+            log = new LogsClass();
             js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
         }
         else
         {
-            UsersClass gu = new UsersClass();
+            UsersClass uc = new UsersClass();
             if (IdUser == userInformation.id_user)
             {
                 var permission = model.PermissionList.ToString();
                 if (permission == "Administrator")
                 {
                     permission = "Admin";
-                    gu.name = model.name;
-                    gu.surname = model.surname;
-                    gu.email = model.email;
-                    gu.admin_group = permission;
-                    Service.EditUserGroup(gu);
-                    js.InvokeVoidAsync("alert", "Pomyślny update!");
-                    log.event_log = "successful update account permisions (admin): " + gu.id_user;
+                    uc.id_user = accountUpdate.id_user;
+                    uc.name = model.name;
+                    uc.surname = model.surname;
+                    uc.email = model.email;
+                    uc.admin_group = permission; 
+                    status = userService.EditUserGroup(uc);
+                    if (status == true)
+                    {
+                        js.InvokeVoidAsync("alert", "Pomyślna aktualizacja konta.");
+                        log.event_log = "successful update account permisions (admin): " + uc.id_user;
+                        if ((claimEmail != model.email && userInformation.id_user == IdUser) || (roleGroup != userInformation.admin_group && userInformation.id_user == IdUser))
+                    {
+                            js.InvokeVoidAsync("alert", "Proszę o zalogowanie się ponownie.");
+                            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+                            await customAuthStateProvider.UpdateAuthenticationState(null);
+                            navManager.NavigateTo("/login", true);
+                        }
+                    }
+                    else
+                    {
+                        js.InvokeVoidAsync("alert", "Nie udało się zaktualizować konta. Spróbuj ponownie później.");
+                        log.event_log = "failed update account permisions (admin): " + uc.id_user;
+                    }
                     logsService.AddNewEvent(log);
-                    return;
+                    log = new LogsClass();
                 }
                 else if (permission == "Użytkownik")
                 {
                     permission = "User";
-                    gu.name = model.name;
-                    gu.surname = model.surname;
-                    gu.email = model.email;
-                    gu.admin_group = permission;
-                    Service.EditUserGroup(gu);
-                    js.InvokeVoidAsync("alert", "Pomyślny update!");
-                    log.event_log = "successful update account permisions (user): " + gu.id_user;
+                    uc.id_user = accountUpdate.id_user;
+                    uc.name = model.name;
+                    uc.surname = model.surname;
+                    uc.email = model.email;
+                    uc.admin_group = permission;
+                    status = userService.EditUserGroup(uc);
+                    if (status == true)
+                    {
+                        js.InvokeVoidAsync("alert", "Pomyślna aktualizacja konta.");
+                        log.event_log = "successful update account permisions (user): " + uc.id_user;
+                        if ((claimEmail != model.email && userInformation.id_user == IdUser) || (roleGroup != userInformation.admin_group && userInformation.id_user == IdUser))
+                        {
+                            js.InvokeVoidAsync("alert", "Proszę o zalogowanie się ponownie.");
+                            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+                            await customAuthStateProvider.UpdateAuthenticationState(null);
+                            navManager.NavigateTo("/login", true);
+                        }
+                    }
+                    else
+                    {
+                        js.InvokeVoidAsync("alert", "Nie udało się zaktualizować konta. Spróbuj ponownie później.");
+                        log.event_log = "failed update account permisions (user): " + uc.id_user;
+                    }
                     logsService.AddNewEvent(log);
-                    return;
+                    log = new LogsClass();
                 }
             }
             else
@@ -195,28 +251,60 @@
                     if (permission == "Administrator")
                     {
                         permission = "Admin";
-                        gu.name = model.name;
-                        gu.surname = model.surname;
-                        gu.email = model.email;
-                        gu.admin_group = permission;
-                        Service.EditUserGroup(gu);
-                        js.InvokeVoidAsync("alert", "Pomyślny update!");
-                        log.event_log = "successful update account permisions (admin): " + gu.id_user;
+                        uc.id_user = accountUpdate.id_user;
+                        uc.name = model.name;
+                        uc.surname = model.surname;
+                        uc.email = model.email;
+                        uc.admin_group = permission;
+                        status = userService.EditUserGroup(uc);
+                        if (status == true)
+                        {
+                            js.InvokeVoidAsync("alert", "Pomyślna aktualizacja konta.");
+                            log.event_log = "successful update account permisions (admin): " + uc.id_user;
+                            if ((claimEmail != model.email && userInformation.id_user == IdUser) || (roleGroup != userInformation.admin_group && userInformation.id_user == IdUser))
+                            {
+                                js.InvokeVoidAsync("alert", "Proszę o zalogowanie się ponownie.");
+                                var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+                                await customAuthStateProvider.UpdateAuthenticationState(null);
+                                navManager.NavigateTo("/login", true);
+                            }
+                        }
+                        else
+                        {
+                            js.InvokeVoidAsync("alert", "Nie udało się zaktualizować konta. Spróbuj ponownie później.");
+                            log.event_log = "failed update account permisions (admin): " + uc.id_user;
+                        }
                         logsService.AddNewEvent(log);
-                        return;
+                        log = new LogsClass();
                     }
                     else if (permission == "Użytkownik")
                     {
                         permission = "User";
-                        gu.name = model.name;
-                        gu.surname = model.surname;
-                        gu.email = model.email;
-                        gu.admin_group = permission;
-                        Service.EditUserGroup(gu);
-                        js.InvokeVoidAsync("alert", "Pomyślny update!");
-                        log.event_log = "successful update account permisions (admin): " + gu.id_user;
+                        uc.id_user = accountUpdate.id_user;
+                        uc.name = model.name;
+                        uc.surname = model.surname;
+                        uc.email = model.email;
+                        uc.admin_group = permission;
+                        status = userService.EditUserGroup(uc);
+                        if (status == true)
+                        {
+                            js.InvokeVoidAsync("alert", "Pomyślna aktualizacja konta.");
+                            log.event_log = "successful update account permisions (user): " + uc.id_user;
+                            if ((claimEmail != model.email && userInformation.id_user == IdUser) || (roleGroup != userInformation.admin_group && userInformation.id_user == IdUser))
+                            {
+                                js.InvokeVoidAsync("alert", "Proszę o zalogowanie się ponownie.");
+                                var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+                                await customAuthStateProvider.UpdateAuthenticationState(null);
+                                navManager.NavigateTo("/login", true);
+                            }
+                        }
+                        else
+                        {
+                            js.InvokeVoidAsync("alert", "Nie udało się zaktualizować konta. Spróbuj ponownie później.");
+                            log.event_log = "failed update account permisions (user): " + uc.id_user;
+                        }
                         logsService.AddNewEvent(log);
-                        return;
+                        log = new LogsClass();
                     }
                 }
                 else
@@ -224,12 +312,11 @@
                     js.InvokeVoidAsync("alert", "Nie pomyślny update!");
                     log.event_log = "failed update account in group: " + model.email;
                     logsService.AddNewEvent(log);
-                    return;
+                    log = new LogsClass();
                 }
 
             }
         }
-
     }
 
     async Task DeleteUser()
