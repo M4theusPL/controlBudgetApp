@@ -6,7 +6,7 @@
 @inject NavigationManager navManager
 @inject IJSRuntime js
 @inject TransactionService transactionService
-@inject UsersService groupUserService
+@inject UsersService userService
 @inject LogsService logsService
 @using System.Security.Claims
 
@@ -30,7 +30,7 @@
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
@@ -52,7 +52,7 @@
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");

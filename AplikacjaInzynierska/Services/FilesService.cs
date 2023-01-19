@@ -2,15 +2,6 @@
 
 namespace AplikacjaInzynierska.Services
 {
-    //public interface IFilesService
-    //{
-    //    List<FilesClass> GetFiles();
-    //    FilesClass Save (FilesClass file);
-    //    FilesClass Upload(byte[] data);
-    //    void Delete(id_file);
-
-        
-    //}
 
     public class FilesService
     {

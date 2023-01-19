@@ -177,9 +177,12 @@
     public int IdTransaction { get; set; } = 0;
 
     Model model = new Model();
+    LogsClass log = new LogsClass();
+    FilesClass filee = new FilesClass();
 
     public string addedBy = "";
     public bool showGroup = false;
+    private FilesClass _selectedFile;
 
     class Model
     {
@@ -200,10 +203,6 @@
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
-    LogsClass log = new LogsClass();
-    FilesClass filee = new FilesClass();
-
-    private FilesClass _selectedFile;
 
     //private async Task HandleFileSelected(InputFileChangeEventArgs e)
     //{

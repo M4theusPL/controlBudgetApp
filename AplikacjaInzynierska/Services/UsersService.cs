@@ -1,9 +1,5 @@
 ﻿using AplikacjaInzynierska.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.Intrinsics.Arm;
-using System.Security.Cryptography;
 
 namespace AplikacjaInzynierska.Services
 {
@@ -21,9 +17,9 @@ namespace AplikacjaInzynierska.Services
             return _dbcontext.users.ToList();
         }
         
-        public List<UsersClass> displayUsersGroup(int Id)
+        public List<UsersClass> displayUsersGroup(int id)
         {
-            return _dbcontext.users.Where(x => x.id_group == Id).ToList();
+            return _dbcontext.users.Where(x => x.id_group == id).ToList();
         }
 
         public UsersClass? GetByUserEmail(string email)
@@ -36,10 +32,10 @@ namespace AplikacjaInzynierska.Services
             return _dbcontext.users.FirstOrDefault(x => x.id_user == id_user);
         }
 
-        public async Task<UsersClass> GetByUserAsync(int Id)
+        public async Task<UsersClass> GetByUserAsync(int id)
         {
-            UsersClass employee = await _dbcontext.users.FirstOrDefaultAsync(c => c.id_user.Equals(Id));
-            return employee;
+            UsersClass user = await _dbcontext.users.FirstOrDefaultAsync(c => c.id_user.Equals(id));
+            return user;
         }
 
         public UsersClass? GetByUserIdGroup(int id_group)
@@ -47,9 +43,9 @@ namespace AplikacjaInzynierska.Services
             return _dbcontext.users.FirstOrDefault(x => x.id_group == id_group);
         }
 
-        public bool AddNewUser(UsersClass gc)
+        public bool AddNewUser(UsersClass uc)
         {
-            _dbcontext.users.Add(gc);
+            _dbcontext.users.Add(uc);
             _dbcontext.SaveChanges();
             return true;
         }
@@ -115,15 +111,15 @@ namespace AplikacjaInzynierska.Services
 
         public bool RemoveUserGroup(int id_user)
         {
-            var up = _dbcontext.users.Where(u => u.id_user == id_user).First();
-            if (up != null)
+            var remove = _dbcontext.users.Where(u => u.id_user == id_user).First();
+            if (remove != null)
             {
-                up.email = up.email;
-                up.password = up.password;
-                up.date_birthday = up.date_birthday.ToUniversalTime().AddDays(1);
-                up.admin_group = "Admin";
-                up.id_group = 0;
-                _dbcontext.users.Update(up);
+                remove.email = remove.email;
+                remove.password = remove.password;
+                remove.date_birthday = remove.date_birthday.ToUniversalTime().AddDays(1);
+                remove.admin_group = "Admin";
+                remove.id_group = 0;
+                _dbcontext.users.Update(remove);
                 _dbcontext.SaveChanges();
                 return true;
             }
@@ -151,17 +147,17 @@ namespace AplikacjaInzynierska.Services
             return _dbcontext.users.FirstOrDefault(x => x.id_group == id_group);
         }
 
-        public bool AddUserGroup(UsersClass gc)
+        public bool AddUserGroup(UsersClass uc)
         {
-            var upp = _dbcontext.users.Where(u => u.email == gc.email).First();
-            if (upp != null)
+            var update = _dbcontext.users.Where(u => u.email == uc.email).First();
+            if (update != null)
             {
-                upp.id_user = gc.id_user;
-                upp.email = gc.email;
-                upp.id_group = gc.id_group;
-                upp.date_birthday = upp.date_birthday.ToUniversalTime();
-                upp.admin_group = gc.admin_group;
-                _dbcontext.users.Update(upp);
+                update.id_user = uc.id_user;
+                update.email = uc.email;
+                update.id_group = uc.id_group;
+                update.date_birthday = update.date_birthday.ToUniversalTime();
+                update.admin_group = uc.admin_group;
+                _dbcontext.users.Update(update);
                 _dbcontext.SaveChanges();
                 return true;
             }
@@ -172,16 +168,16 @@ namespace AplikacjaInzynierska.Services
 
         }
 
-        public async Task<int> ilejestwgrupie(int id_group)
+        public async Task<int> InGroupUsers(int id_group)
         {
-            int upp = _dbcontext.users.Where(u => u.id_group == id_group).Count();
-            return upp;
+            int users = _dbcontext.users.Where(u => u.id_group == id_group).Count();
+            return users;
         }
 
-        public async Task<int> ilejestwgrupieadminow(int id_group)
+        public async Task<int> InGroupAdmin(int id_group)
         {
-            int upp = _dbcontext.users.Where(u => u.id_group == id_group && u.admin_group == "Admin").Count();
-            return upp;
+            int admins = _dbcontext.users.Where(u => u.id_group == id_group && u.admin_group == "Admin").Count();
+            return admins;
         }
     }
 }

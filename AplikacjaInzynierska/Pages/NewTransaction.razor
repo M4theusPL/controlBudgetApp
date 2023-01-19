@@ -4,7 +4,7 @@
 @using AplikacjaInzynierska.Data
 @attribute [Authorize(Roles = "Admin, User")]
 @inject TransactionService transactionService
-@inject UsersService groupUserService
+@inject UsersService userService
 @inject LogsService logsService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
@@ -99,7 +99,7 @@
             </div>
 
             <div>
-                <button type="button" class="btn btn-success" @onclick="Authenticate">Dodaj transakcję</button>
+                <button type="button" class="btn btn-success" @onclick="AddTransaction">Dodaj transakcję</button>
             </div>
 
         </div>
@@ -110,7 +110,9 @@
 
 @code {
 
-        Model model = new Model();
+   Model model = new Model();
+   TransactionsClass tc = new TransactionsClass();
+   LogsClass log = new LogsClass();
 
     class Model
     {
@@ -131,15 +133,12 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    TransactionsClass gu = new TransactionsClass();
-    LogsClass log = new LogsClass();
-
-    async Task Authenticate()
+    async Task AddTransaction()
     {
         var authState = await authenticationState;
         var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
@@ -149,14 +148,14 @@
         log.id_user = userInformation.id_user;
 
 
-        gu.id_user = Int32.Parse(claimIdUser);
-        gu.id_group = userInformation.id_group;
-        gu.name_transaction = model.name_transaction;
-        gu.description = model.description;
-        gu.amount = model.amount;
-        gu.date_transaction = model.date_transaction.ToUniversalTime().AddDays(1);
-        gu.type_transaction = model.ListTransactions.ToString();
-        transactionService.AddNewTransaction(gu);
+        tc.id_user = Int32.Parse(claimIdUser);
+        tc.id_group = userInformation.id_group;
+        tc.name_transaction = model.name_transaction;
+        tc.description = model.description;
+        tc.amount = model.amount;
+        tc.date_transaction = model.date_transaction.ToUniversalTime().AddDays(1);
+        tc.type_transaction = model.ListTransactions.ToString();
+        transactionService.AddNewTransaction(tc);
         var topId = transactionService.showTopIdTransactionUser(userInformation.id_user);
         log.event_log = "added new transaction. ID: "+topId;
         logsService.AddNewEvent(log);

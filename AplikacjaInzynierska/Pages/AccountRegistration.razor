@@ -2,7 +2,7 @@
 @using AplikacjaInzynierska.Authentication
 @using AplikacjaInzynierska.Services
 @using AplikacjaInzynierska.Data
-@inject UsersService groupUserService
+@inject UsersService userService
 @inject LogsService logsService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
@@ -102,7 +102,7 @@
         public string? repeatpassword { get; set; }
     }
 
-    UsersClass gu = new UsersClass();
+    UsersClass uc = new UsersClass();
     LogsClass log = new LogsClass();
 
     void Authenticate()
@@ -116,7 +116,7 @@
 
         if (model.password == model.repeatpassword)
         {
-            var userAccount = groupUserService.GetByUserEmail(model.email);
+            var userAccount = userService.GetByUserEmail(model.email);
             if (userAccount == null)
             {
                 var sha256 = SHA256.Create();
@@ -124,15 +124,15 @@
                 var passwordHash = sha256.ComputeHash(passwordBytes);
                 string passwordHashed = BitConverter.ToString(passwordHash).Replace("-", "").ToLower();
 
-                gu.id_user = 0;
-                gu.id_group = 0;
-                gu.admin_group = "Admin";
-                gu.name = model.name;
-                gu.surname = model.surname;
-                gu.date_birthday = model.date_birthday.ToUniversalTime();
-                gu.email = model.email;
-                gu.password = passwordHashed;
-                groupUserService.AddNewUser(gu);
+                uc.id_user = 0;
+                uc.id_group = 0;
+                uc.admin_group = "Admin";
+                uc.name = model.name;
+                uc.surname = model.surname;
+                uc.date_birthday = model.date_birthday.ToUniversalTime();
+                uc.email = model.email;
+                uc.password = passwordHashed;
+                userService.AddNewUser(uc);
                 navManager.NavigateTo("/accountcreatedsuccessfully", true);
 
                 log.event_log = "successful register account: " + model.email;
@@ -140,23 +140,23 @@
             }
             else
             {
-                js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
                 log.event_log = "failed register account: " + model.email;
                 logsService.AddNewEvent(log);
                 model.password = "";
                 model.repeatpassword = "";
                 log = new LogsClass();
+                js.InvokeVoidAsync("alert", "Konto pod tym adresem email już istnieje!");
                 return;
             }
         }
         else 
         {
-            js.InvokeVoidAsync("alert", "Hasła się nie zgadzają!");
             log.event_log = "failed register account: " + model.email;
             logsService.AddNewEvent(log);
             model.password = "";
             model.repeatpassword = "";
             log = new LogsClass();
+            js.InvokeVoidAsync("alert", "Hasła się nie zgadzają!");
             return;
         }
     }

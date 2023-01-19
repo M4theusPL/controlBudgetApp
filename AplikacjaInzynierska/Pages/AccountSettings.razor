@@ -94,7 +94,7 @@
                 </div>
             </div>
 
-             <button type="button" class="btn btn-success" @onclick="Authenticate">Zapisz</button>
+             <button type="button" class="btn btn-success" @onclick="CreateAccount">Zapisz</button>
         </div>
     </div>
 </EditForm>
@@ -102,6 +102,7 @@
 @code {
 
     Model model = new Model();
+    LogsClass log = new LogsClass();
 
     class Model
     {
@@ -117,9 +118,6 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    public System.Collections.Generic.IList<UsersClass> userr;
-    LogsClass log = new LogsClass();
-
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationState;
@@ -132,7 +130,7 @@
         model.date_birthday = userInformation.date_birthday;
     }
 
-    async Task Authenticate()
+    async Task CreateAccount()
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
@@ -188,28 +186,27 @@
                     {
                         if ((model.newpassword != "") && (model.newpassword == model.repeatpassword))
                         {
-                            UsersClass gu = new UsersClass();
+                            UsersClass uc = new UsersClass();
 
                             var newPasswordBytes = System.Text.Encoding.UTF8.GetBytes(model.newpassword);
                             var newPasswordHash = sha256.ComputeHash(newPasswordBytes);
                             string newPasswordHashed = BitConverter.ToString(newPasswordHash).Replace("-", "").ToLower();
 
-                            gu.name = model.name;
-                            gu.surname = model.surname;
-                            gu.date_birthday = model.date_birthday;
-                            gu.email = model.email;
-                            gu.password = passwordHashed;
+                            uc.name = model.name;
+                            uc.surname = model.surname;
+                            uc.date_birthday = model.date_birthday;
+                            uc.email = model.email;
+                            uc.password = passwordHashed;
                             string newpassword = newPasswordHashed;
 
-                        userService.EditUser(gu, userInformation.id_user, newpassword);
+                            userService.EditUser(uc, userInformation.id_user, newpassword);
                             model.password = "";
                             model.newpassword = "";
                             model.repeatpassword = "";
 
-                            
                             log.event_log = "successful update account with password";
                             logsService.AddNewEvent(log);
-                        log = new LogsClass();
+                            log = new LogsClass();
                             js.InvokeVoidAsync("alert", "Pomyślna aktualizacja konta!");
                             js.InvokeVoidAsync("alert", "Proszę o zalogowanie się ponownie.");
                             var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
@@ -218,27 +215,25 @@
                         }
                         else
                         {
-                            js.InvokeVoidAsync("alert", "Nowe hasła nie są takie same!");
                             model.password = "";
                             model.newpassword = "";
                             model.repeatpassword = "";
                             log.event_log = "failed update account with password";
-                        
                             logsService.AddNewEvent(log);
-                        log = new LogsClass();
+                            log = new LogsClass();
+                            js.InvokeVoidAsync("alert", "Nowe hasła nie są takie same!");
                         }
                         
                     }
                     else
                     {
-                        js.InvokeVoidAsync("alert", "Stare hasło podano nieprawidłowe!");
                         model.password = "";
                         model.newpassword = "";
                         model.repeatpassword = "";
                         log.event_log = "failed update account with password";
-                   
                         logsService.AddNewEvent(log);
-                    log = new LogsClass();
+                        log = new LogsClass();
+                        js.InvokeVoidAsync("alert", "Stare hasło podano nieprawidłowe!");
                     }
                 }
             if (claimEmail != model.email)

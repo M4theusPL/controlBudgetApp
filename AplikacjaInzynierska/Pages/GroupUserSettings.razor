@@ -88,6 +88,7 @@
     public int IdGroup { get; set; } = 0;
 
     Model model = new Model();
+    LogsClass log = new LogsClass();
 
     class Model
     {
@@ -105,7 +106,6 @@
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
-    LogsClass log = new LogsClass();
 
     protected override async Task OnInitializedAsync()
     {
@@ -353,16 +353,16 @@
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         var userInformation = userService.GetByUserEmail(claimEmail);
-        int ilewgrupie = await userService.ilejestwgrupie(userInformation.id_group);
-        int ilewgrupieadminow = await userService.ilejestwgrupieadminow(userInformation.id_group);
+        int inGroupU = await userService.InGroupUsers(userInformation.id_group);
+        int inGroupA = await userService.InGroupAdmin(userInformation.id_group);
 
-        if (ilewgrupie >= 2)
+        if (inGroupU >= 2)
         {
-            if (ilewgrupieadminow >= 2)
+            if (inGroupA >= 2)
             {
                 navManager.NavigateTo("/userdeletefromgroup/" + IdUser + "/" + IdGroup, true);
             }
-            else if (ilewgrupieadminow == 1 && userInformation.id_group != IdUser)
+            else if (inGroupA == 1 && userInformation.id_group != IdUser)
             {
                 navManager.NavigateTo("/userdeletefromgroup/" + IdUser + "/" + IdGroup, true);
             }

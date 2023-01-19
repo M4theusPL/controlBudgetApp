@@ -13,7 +13,7 @@
 
 <PageTitle>controlBudgetApp - Ustawienia grupy</PageTitle>
 
-@if (sc == null)
+@if (ucList == null)
 {
     <EditForm Model="model">
         <div class="row justify-content-md-center">
@@ -50,7 +50,7 @@ else
                         </thead>
 
                         <tbody>
-                            @foreach (var item in sc)
+                            @foreach (var item in ucList)
                             {
                                 <tr>
                                     <td>@item.email</td>
@@ -79,7 +79,7 @@ else
                                 <label class="input-group-text" >Email</label>
                                 <InputText class="form-control" maxlength="40" @bind-Value="model.email" />
                             </div>
-                            <button type="button" class="btn btn-success" @onclick="Authenticate">Dodaj użytkownika</button>
+                            <button type="button" class="btn btn-success" @onclick="AddUserGroup">Dodaj użytkownika</button>
                         </div>
                     </div>
                 </EditForm>
@@ -104,7 +104,7 @@ else
                         </thead>
 
                         <tbody>
-                            @foreach (var item in sc)
+                            @foreach (var item in ucList)
                             {
                                 <tr>
                                     <td>@item.email</td>
@@ -124,6 +124,8 @@ else
 @code {
 
     Model model = new Model();
+    LogsClass log = new LogsClass();
+    GroupClass gc = new GroupClass();
 
     class Model
     {
@@ -136,9 +138,7 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    public System.Collections.Generic.IList<UsersClass> sc;
-    LogsClass log = new LogsClass();
-    GroupClass gc = new GroupClass();
+    public System.Collections.Generic.IList<UsersClass> ucList; 
 
     protected override async Task OnInitializedAsync()
     {
@@ -150,13 +150,13 @@ else
 
         if (id_group == 0)
         {
-            sc = null;
+            ucList = null;
         }
         else
         {
             var nameGroup = groupService.GetGroupName(Convert.ToInt32(id_group));
             nameGroupDisplay = nameGroup.name_group;
-            sc = usersService.displayUsersGroup(id_group);
+            ucList = usersService.displayUsersGroup(id_group);
         }
     }
 
@@ -195,7 +195,7 @@ else
         }
     }
 
-    async Task Authenticate()
+    async Task AddUserGroup()
     {
         if (model.email != "")
         {
@@ -246,7 +246,6 @@ else
                     return;
                 }
             }
-            
         }
         else
         {

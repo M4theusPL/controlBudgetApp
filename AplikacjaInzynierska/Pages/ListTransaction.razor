@@ -6,7 +6,7 @@
 @attribute [Authorize(Roles = "Admin, User")]
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims;
-@inject UsersService groupUserService
+@inject UsersService userService
 @inject LogsService logsService
 @using Microsoft.JSInterop
 @using iTextSharp.text;
@@ -16,7 +16,7 @@
 
 <PageTitle>controlBudgetApp - Lista transakcji</PageTitle>
 
-@if (trans == null)
+@if (transClass == null)
 {
     <div class="row justify-content-md-center text-center">
         <p class="fs-4 fw-bold">Brak transakcji. Proszę dodać transakcje.</p>
@@ -24,11 +24,6 @@
 } 
 else
 {
-
-        
-            
-        
-
     <div class="row justify-content-md-center text-center">
         
         <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
@@ -54,7 +49,6 @@ else
 
                                 <div class="col-xs-4 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-4">
                                     <div class="input-group mb-2">
-                                        @*Sortuj od*@
                                         <label class="input-group-text">sortuj od</label>
                                         <select class="form-select" Id="CountryList" @bind="SelectedValue" @bind:event="oninput" @onchange="@FilterChanged">
                                             @foreach (var item in Filters)
@@ -86,7 +80,7 @@ else
                         </thead>
 
                         <tbody>
-                            @foreach (var trans in trans)
+                        @foreach (var trans in transClass)
                             {
                                 <tr>
                                     <td>@trans.id_user_transaction</td>
@@ -122,6 +116,8 @@ else
     private string SearchedText { get; set; } = "";
 
     public Filter filter = new Filter();
+    public List<Filter> Filters { get; set; }
+    LogsClass log = new LogsClass();
     public int SelectedValue { get; set; } = 1;
 
     public class Filter
@@ -129,20 +125,19 @@ else
         public int IdFilter { get; set; }
         public string Title { get; set; }
     }
-    public List<Filter> Filters { get; set; }
+
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    public System.Collections.Generic.IList<TransactionsClass> trans;
-    LogsClass log = new LogsClass();
+    public System.Collections.Generic.IList<TransactionsClass> transClass;
 
     public async Task<byte[]> PDFGenerate()
     {
         var authState = await authenticationState;
         var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
@@ -186,7 +181,7 @@ else
             cell = new PdfPCell(new Phrase("Data transakcji", new Font(Font.HELVETICA, 12, Font.BOLD)));
             table.AddCell(cell);
 
-            foreach (var item in trans)
+            foreach (var item in transClass)
             {
                 table.AddCell(item.id_user_transaction.ToString());
                 table.AddCell(item.name_transaction);
@@ -212,17 +207,17 @@ else
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         await JSRuntime.InvokeAsync<object>("console.log", SelectedValue);
 
         if (userInformation.id_group == 0)
         {
-            trans = Service.displaySearchTransaction(userInformation.id_user, SearchedText, SelectedValue);
+            transClass = Service.displaySearchTransaction(userInformation.id_user, SearchedText, SelectedValue);
         }
         else
         {
-            trans = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText, SelectedValue);
+            transClass = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText, SelectedValue);
         }
     }
 
@@ -246,25 +241,25 @@ else
         var authState = await authenticationState;
         var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
-        trans = null;
+        var userInformation = userService.GetByUserEmail(claimEmail);
+        transClass = null;
         if (userInformation.id_group == 0)
         {
             var userTransactions = transactionService.GetByUserTransactions(Int32.Parse(claimIdUser));
             if (userTransactions == null)
             {
 
-                trans = null;
+                transClass = null;
             }
             else
             {
                 if (SearchedText.Trim().Length > 0)
                 {
-                    trans = Service.displaySearchTransaction(userInformation.id_user, SearchedText, SelectedValue);
+                    transClass = Service.displaySearchTransaction(userInformation.id_user, SearchedText, SelectedValue);
                 }
                 else
                 {
-                    trans = Service.displayUserTransaction(Int32.Parse(claimIdUser));
+                    transClass = Service.displayUserTransaction(Int32.Parse(claimIdUser));
                 }
             }
         }
@@ -274,17 +269,17 @@ else
             if (groupTransactions == null)
             {
 
-                trans = null;
+                transClass = null;
             }
             else
             {
                 if (SearchedText.Trim().Length > 0)
                 {
-                    trans = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText, SelectedValue);
+                    transClass = Service.displayGroupSearchTransaction(userInformation.id_group, SearchedText, SelectedValue);
                 }
                 else 
                 {
-                    trans = Service.displayGroupTransaction(userInformation.id_group);
+                    transClass = Service.displayGroupTransaction(userInformation.id_group);
                 }             
             }
         }

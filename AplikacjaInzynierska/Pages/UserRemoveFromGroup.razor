@@ -6,7 +6,7 @@
 @inject NavigationManager navManager
 @inject IJSRuntime js
 @inject TransactionService transactionService
-@inject UsersService groupUserService
+@inject UsersService userService
 @inject LogsService logsService
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims
@@ -50,8 +50,8 @@ else
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
-        var deleteIdUser = groupUserService.GetByUserIdUser(IdUser);
+        var userInformation = userService.GetByUserEmail(claimEmail);
+        var deleteIdUser = userService.GetByUserIdUser(IdUser);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
@@ -89,8 +89,8 @@ else
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
-        var deleteIdUser = groupUserService.GetByUserIdUser(IdUser);
+        var userInformation = userService.GetByUserEmail(claimEmail);
+        var deleteIdUser = userService.GetByUserIdUser(IdUser);
 
         if(deleteIdUser.id_group == userInformation.id_group)
         {
@@ -102,7 +102,7 @@ else
                 log.time = TimeOnly.Parse(timeNow);
                 log.id_user = userInformation.id_user;
 
-                groupUserService.RemoveUserGroup(IdUser);
+                userService.RemoveUserGroup(IdUser);
                 transactionService.RemoveTransactionsGroup(IdUser);
                 log.event_log = "successful delete user from group: " + IdGroup + " ID user: " + IdUser;
                 logsService.AddNewEvent(log);
@@ -125,7 +125,7 @@ else
     {
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = groupUserService.GetByUserEmail(claimEmail);
+        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");

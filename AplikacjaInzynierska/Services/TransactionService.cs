@@ -1,8 +1,5 @@
 ﻿using AplikacjaInzynierska.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Data.Entity;
-using System.Security.Cryptography;
 
 namespace AplikacjaInzynierska.Services
 {
@@ -141,9 +138,9 @@ namespace AplikacjaInzynierska.Services
             return transactionsGroup.ToList();
         }
 
-        public bool AddNewTransaction(TransactionsClass gc)
+        public bool AddNewTransaction(TransactionsClass tc)
         {
-            _dbcontext.transactions.Add(gc);
+            _dbcontext.transactions.Add(tc);
             _dbcontext.SaveChanges();
             return true;
         }
@@ -256,18 +253,18 @@ namespace AplikacjaInzynierska.Services
             return _dbcontext.transactions.Where(x => x.id_group == id_group && x.type_transaction == "Inwestycja" && x.date_transaction >= startDate && x.date_transaction <= endDate).Sum(x => x.amount);
         }
 
-        public bool EditTransaction(TransactionsClass gc)
+        public bool EditTransaction(TransactionsClass tc)
         {
-            var up = _dbcontext.transactions.Where(u => u.id_user_transaction == gc.id_user_transaction).First();
-            if (up != null)
+            var editTrans = _dbcontext.transactions.Where(u => u.id_user_transaction == tc.id_user_transaction).First();
+            if (editTrans != null)
             {
-                up.name_transaction = gc.name_transaction;
-                up.description = gc.description;
-                up.amount = gc.amount;
-                up.date_transaction = gc.date_transaction.ToUniversalTime().AddDays(1);
-                up.type_transaction = gc.type_transaction;
+                editTrans.name_transaction = tc.name_transaction;
+                editTrans.description = tc.description;
+                editTrans.amount = tc.amount;
+                editTrans.date_transaction = tc.date_transaction.ToUniversalTime().AddDays(1);
+                editTrans.type_transaction = tc.type_transaction;
 
-                _dbcontext.transactions.Update(up);
+                _dbcontext.transactions.Update(editTrans);
                 _dbcontext.SaveChanges();
                 return true;
             }
@@ -280,18 +277,16 @@ namespace AplikacjaInzynierska.Services
 
         public bool RemoveTransactionsGroup(int id_user)
         {
-            var up = _dbcontext.transactions.Where(u => u.id_user == id_user).ToList();
-            if (up != null)
+            var removeTrans = _dbcontext.transactions.Where(u => u.id_user == id_user).ToList();
+            if (removeTrans != null)
             {
-                foreach (var xr in up)
+                foreach (var rt in removeTrans)
                 {
-                    xr.id_user = id_user;
-                    xr.id_group = 0;
-                    xr.date_transaction = xr.date_transaction.ToUniversalTime().AddDays(1);
-                    _dbcontext.transactions.Update(xr);
+                    rt.id_user = id_user;
+                    rt.id_group = 0;
+                    rt.date_transaction = rt.date_transaction.ToUniversalTime().AddDays(1);
+                    _dbcontext.transactions.Update(rt);
                 }
-                
-                
                 _dbcontext.SaveChanges();
                 return true;
             }
@@ -304,15 +299,15 @@ namespace AplikacjaInzynierska.Services
 
         public bool AddTransactionGroup(int id_user, int id_group)
         {
-            var up = _dbcontext.transactions.Where(u => u.id_user == id_user).ToList();
-            if (up != null)
+            var addTrans = _dbcontext.transactions.Where(u => u.id_user == id_user).ToList();
+            if (addTrans != null)
             {
-                foreach (var xr in up)
+                foreach (var at in addTrans)
                 {
-                    xr.id_user = id_user;
-                    xr.id_group = id_group;
-                    xr.date_transaction = xr.date_transaction.ToUniversalTime().AddDays(1);
-                    _dbcontext.transactions.Update(xr);
+                    at.id_user = id_user;
+                    at.id_group = id_group;
+                    at.date_transaction = at.date_transaction.ToUniversalTime().AddDays(1);
+                    _dbcontext.transactions.Update(at);
                 }
                 
                 
@@ -327,10 +322,10 @@ namespace AplikacjaInzynierska.Services
         }
         public bool DeleteTransaction(int id_user_transaction)
         {
-            var up = _dbcontext.transactions.Where(u => u.id_user_transaction == id_user_transaction).First();
-            if(up != null)
+            var deleteTrans = _dbcontext.transactions.Where(u => u.id_user_transaction == id_user_transaction).First();
+            if(deleteTrans != null)
             {
-                _dbcontext.transactions.Remove(up);
+                _dbcontext.transactions.Remove(deleteTrans);
                 _dbcontext.SaveChanges();
                 return true;
             }
