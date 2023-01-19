@@ -16,77 +16,146 @@
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
-        <div class="col-5 border p-3 mb-2 bg-light text-dark text-center rounded">
+        <div class="col-xs-12 col-md-11 col-lg-9 col-xl-6 col-xxl-5 border p-3 mb-2 bg-light text-dark text-center rounded">
             <p class="fs-4 fw-bold">
                 Transakcja numer: @model.id_user_transaction
             </p>
 
-            @if (showGroup == true)
-            {
-                <div class="input-group mb-3">
-                    <label class="col-sm-5 input-group-text" >Dodane przez</label>
-                    <InputText class="form-control" @bind-Value="@addedBy" ReadOnly="true" />
-                </div>
-            }
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Nazwa transakcji</label>
-                <InputText class="form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Nazwa transakcji</label>
-                <InputText class="form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Opis</label>
-                <InputTextArea class="form-control" maxlength="250" @bind-Value="model.description"/>
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Kwota</label>
-                <InputNumber class="form-control" min="0.00" step="0.01" @bind-Value="model.amount" />
-                <label class="input-group-text">zł</label>
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Data transakcji</label>
-                <InputDate class="form-control" @bind-Value="model.date_transaction" />
-            </div>
-
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Typ</label>
-                <InputSelect class="form-select" @bind-Value="model.ListTransactions" >
-                    @foreach (var Transaction in Enum.GetValues(typeof(ListTransactions)))
-                    {
-                            <option value="@Transaction">@Transaction</option>
-                    }
-                </InputSelect>
-            </div>
-
-            <div class="input-group mb-3">
-                    <label class="col-sm-5 input-group-text">Załącznik</label>
-                   @* <InputFile OnChange="HandleFileSelected" />*@
-            <!-- add file -->
-            @*<InputFile OnChange=""/>*@
-            @*@foreach(var inv in Invs)
-            {
-                        
-                        @*<InputFile OnChange="@(e => HandleFileSelected(e, inv.id_file))" multiple  /> *@
-                            @*<input type="file" onchange="@(e => HandleFileSelected(e, inv.id_file))">*@
-                        @*
-                
-
-                @if (inv.attachment != null)
+            <div class="container d-none d-lg-block d-xl-block d-xxl-block">
+                @if (showGroup == true)
                 {
-                    <button @onclick="@(e=>DownloadPdf(inv.id_file))">pobierz</button>
-                    <button @onclick="@(e=>DeletePdf(inv.id_file))">usun</button>
+                    <div class="input-group mb-3">
+                        <label class="col-4 col-lg-5 input-group-text" >Dodane przez</label>
+                        <InputText class="col-8 col-lg-7 form-control" @bind-Value="@addedBy" ReadOnly="true" />
+                    </div>
                 }
+
+                <div class="input-group mb-3">
+                    <label class="col-sm-5 input-group-text" >Nazwa transakcji</label>
+                    <InputText class="col-8 col-lg-7 form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-sm-5 input-group-text" >Nazwa transakcji</label>
+                    <InputText class="col-8 col-lg-7 form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-sm-5 input-group-text" >Opis</label>
+                    <InputTextArea class="col-8 col-lg-7 form-control" maxlength="250" @bind-Value="model.description"/>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-4 col-lg-5 input-group-text" >Kwota</label>
+                    <InputNumber class="col-8 col-lg-7 form-control" min="0.00" step="0.01" @bind-Value="model.amount" />
+                    <label class="input-group-text">zł</label>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-4 col-lg-5 input-group-text" >Data transakcji</label>
+                    <InputDate class="col-8 col-lg-7 form-control" @bind-Value="model.date_transaction" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-4 col-lg-5 input-group-text" >Typ</label>
+                    <InputSelect class="col-8 col-lg-7 form-select" @bind-Value="model.ListTransactions" >
+                        @foreach (var Transaction in Enum.GetValues(typeof(ListTransactions)))
+                        {
+                                <option value="@Transaction">@Transaction</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="input-group mb-3">
+                        <label class="col-4 col-lg-5 input-group-text">Załącznik</label>
+                       @* <InputFile OnChange="HandleFileSelected" />*@
+                <!-- add file -->
+                @*<InputFile OnChange=""/>*@
+                @*@foreach(var inv in Invs)
+                {
+                        
+                            @*<InputFile OnChange="@(e => HandleFileSelected(e, inv.id_file))" multiple  /> *@
+                                @*<input type="file" onchange="@(e => HandleFileSelected(e, inv.id_file))">*@
+                            @*
                 
-            }*@
+
+                    @if (inv.attachment != null)
+                    {
+                        <button @onclick="@(e=>DownloadPdf(inv.id_file))">pobierz</button>
+                        <button @onclick="@(e=>DeletePdf(inv.id_file))">usun</button>
+                    }
+                
+                }*@
+                </div>
             </div>
-            
+
+             <div class="container d-lg-none d-xl-none d-xxl-nonek">
+                @if (showGroup == true)
+                {
+                    <div class="input-group mb-3">
+                        <label class="col-12 input-group-text" >Dodane przez</label>
+                        <InputText class="col-12 form-control" @bind-Value="@addedBy" ReadOnly="true" />
+                    </div>
+                }
+
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text" >Nazwa transakcji</label>
+                    <InputText class="col-12 form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text" >Nazwa transakcji</label>
+                    <InputText class="col-12 form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text" >Opis</label>
+                    <InputTextArea class="col-12 form-control" maxlength="250" @bind-Value="model.description"/>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text" >Kwota</label>
+                    <InputNumber class="col-12 form-control" min="0.00" step="0.01" @bind-Value="model.amount" />
+                    <label class="input-group-text">zł</label>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text" >Data transakcji</label>
+                    <InputDate class="col-12 form-control" @bind-Value="model.date_transaction" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text" >Typ</label>
+                    <InputSelect class="col-12 form-select" @bind-Value="model.ListTransactions" >
+                        @foreach (var Transaction in Enum.GetValues(typeof(ListTransactions)))
+                        {
+                                <option value="@Transaction">@Transaction</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="input-group mb-3">
+                        <label class="col-12 input-group-text">Załącznik</label>
+                       @* <InputFile OnChange="HandleFileSelected" />*@
+                <!-- add file -->
+                @*<InputFile OnChange=""/>*@
+                @*@foreach(var inv in Invs)
+                {
+                        
+                            @*<InputFile OnChange="@(e => HandleFileSelected(e, inv.id_file))" multiple  /> *@
+                                @*<input type="file" onchange="@(e => HandleFileSelected(e, inv.id_file))">*@
+                            @*
+                
+
+                    @if (inv.attachment != null)
+                    {
+                        <button @onclick="@(e=>DownloadPdf(inv.id_file))">pobierz</button>
+                        <button @onclick="@(e=>DeletePdf(inv.id_file))">usun</button>
+                    }
+                
+                }*@
+                </div>
+            </div>
 
             <div>
                 <button type="button" class="btn btn-success" @onclick="EditTransaction" >Edytuj transakcję</button>

@@ -19,12 +19,12 @@
                 <InputText type="password" class="form-control" @bind-Value="model.password" placeholder="Hasło" />
                 <br />
             <div class="row justify-content-around">
-                <div class="col-5">
-                    <button type="button" class="btn btn-success" @onclick="Authenticate">Zaloguj się</button>
-                </div>
-                <div class="col-5">
+                <div class="col-12">
+                    <button type="button" class="btn btn-success float-start" @onclick="Authenticate">Zaloguj się</button>
+                @*</div>*@
+                @*<div class="col-5">*@
                     <NavLink href="/accountregistration">
-                        <button type="button" class="btn btn-warning">Utwórz konto</button>
+                        <button type="button" class="btn btn-warning float-end">Utwórz konto</button>
                     </NavLink>
                 </div>
 

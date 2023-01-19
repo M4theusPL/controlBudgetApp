@@ -15,43 +15,83 @@
 
 <EditForm Model="model">
     <div class="row justify-content-md-center">
-        <div class="col-5 border p-3 mb-2 bg-light text-dark text-center rounded">
+        <div class="col-xs-12 col-md-11 col-lg-9 col-xl-6 col-xxl-5 border p-3 mb-2 bg-light text-dark text-center rounded">
             <p class="fs-4 fw-bold">
                 Ustawienia konta
             </p>
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Imię</label>
-                    <InputText class="form-control" maxlength="40" @bind-Value="model.name" />
+            <div class="container d-none d-lg-block d-xl-block d-xxl-block">
+                <div class="input-group mb-3">
+                    <label class="col-4 col-lg-5 input-group-text" >Imię</label>
+                    <InputText class="col-8 col-lg-7 form-control" maxlength="40" @bind-Value="model.name" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-4 col-lg-5 input-group-text" >Nazwisko</label>
+                    <InputText class="col-8 col-lg-7 form-control" maxlength="150" @bind-Value="model.surname" />
+                </div>
+
+               <div class="input-group mb-3">
+                    <label class="col-4 col-lg-5 input-group-text" >Email</label>
+                    <InputText class="col-8 col-lg-7 form-control" maxlength="150" @bind-Value="model.email" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-4 col-lg-5 input-group-text" >Stare hasło</label>
+                    <InputText type="password" class="col-8 col-lg-7 form-control" @bind-Value="model.password" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-4 col-lg-5 input-group-text" >Nowe hasło</label>
+                    <InputText type="password" class="col-8 col-lg-7 form-control" @bind-Value="model.newpassword" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="col-4 col-lg-5 input-group-text" >Powtórz nowe hasło</span>
+                    <InputText type="password" class="col-8 col-lg-7 form-control" @bind-Value="model.repeatpassword" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-4 col-lg-5 input-group-text" >Data urodzenia</label>
+                    <InputDate class="form-control" @bind-Value="model.date_birthday" />
+                </div>
             </div>
 
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Nazwisko</label>
-                <InputText class="form-control" maxlength="150" @bind-Value="model.surname" />
-            </div>
 
-           <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Email</label>
-                <InputText class="form-control" maxlength="150" @bind-Value="model.email" />
-            </div>
+            <div class="container d-lg-none d-xl-none d-xxl-none">
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text rounded" >Imię</label>
+                    <InputText class="col-12 form-control rounded" maxlength="40" @bind-Value="model.name" />
+                </div>
 
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Stare hasło</label>
-                <InputText type="password" class="form-control" @bind-Value="model.password" />
-            </div>
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text rounded" >Nazwisko</label>
+                    <InputText class="col-12 form-control rounded" maxlength="150" @bind-Value="model.surname" />
+                </div>
 
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Nowe hasło</label>
-                <InputText type="password" class="form-control" @bind-Value="model.newpassword" />
-            </div>
+               <div class="input-group mb-3">
+                    <label class="col-12 input-group-text rounded" >Email</label>
+                    <InputText class="col-12 form-control rounded" maxlength="150" @bind-Value="model.email" />
+                </div>
 
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Powtórz nowe hasło</label>
-                <InputText type="password" class="form-control" @bind-Value="model.repeatpassword" />
-            </div>
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text rounded" >Stare hasło</label>
+                    <InputText type="password" class="col-12 form-control rounded" @bind-Value="model.password" />
+                </div>
 
-            <div class="input-group mb-3">
-                <label class="col-sm-5 input-group-text" >Data urodzenia</label>
-                <InputDate class="form-control" @bind-Value="model.date_birthday" />
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text rounded" >Nowe hasło</label>
+                    <InputText type="password" class="col-12 form-control rounded" @bind-Value="model.newpassword" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="col-12 input-group-text rounded" >Powtórz nowe hasło</span>
+                    <InputText type="password" class="col-12 form-control rounded" @bind-Value="model.repeatpassword" />
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="col-12 input-group-text rounded" >Data urodzenia</label>
+                    <InputDate class="form-control rounded" @bind-Value="model.date_birthday" />
+                </div>
             </div>
 
              <button type="button" class="btn btn-success" @onclick="Authenticate">Zapisz</button>
