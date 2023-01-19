@@ -49,22 +49,22 @@
             <div class="container d-lg-none d-xl-none d-xxl-none">
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Imię</label>
-                    <InputText class="col-12 form-control" @bind-Value="model.name"/>
+                    <InputText class="col-12 form-control rounded" @bind-Value="model.name"/>
                 </div>
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Nazwisko</label>
-                    <InputText class="col-12 form-control" maxlength="250" @bind-Value="model.surname"/>
+                    <InputText class="col-12 form-control rounded" maxlength="250" @bind-Value="model.surname"/>
                 </div>
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Email</label>
-                    <InputText class="col-12 form-control" @bind-Value="model.email" />
+                    <InputText class="col-12 form-control rounded" @bind-Value="model.email" />
                 </div>
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Rola</label>
-                    <InputSelect class="col-12 form-select" @bind-Value="model.PermissionList" >
+                    <InputSelect class="col-12 form-select rounded" @bind-Value="model.PermissionList" >
                         @foreach (var Permission in Enum.GetValues(typeof(PermissionList)))
                         {
                                 <option value="@Permission">@Permission</option>

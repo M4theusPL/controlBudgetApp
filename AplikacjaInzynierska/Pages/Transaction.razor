@@ -94,39 +94,39 @@
                 {
                     <div class="input-group mb-3">
                         <label class="col-12 input-group-text" >Dodane przez</label>
-                        <InputText class="col-12 form-control" @bind-Value="@addedBy" ReadOnly="true" />
+                        <InputText class="col-12 form-control rounded" @bind-Value="@addedBy" ReadOnly="true" />
                     </div>
                 }
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Nazwa transakcji</label>
-                    <InputText class="col-12 form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
+                    <InputText class="col-12 form-control rounded" id="nameTransaction" @bind-Value="model.name_transaction" />
                 </div>
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Nazwa transakcji</label>
-                    <InputText class="col-12 form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
+                    <InputText class="col-12 form-control rounded" id="nameTransaction" @bind-Value="model.name_transaction" />
                 </div>
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Opis</label>
-                    <InputTextArea class="col-12 form-control" maxlength="250" @bind-Value="model.description"/>
+                    <InputTextArea class="col-12 form-control rounded" maxlength="250" @bind-Value="model.description"/>
                 </div>
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Kwota</label>
-                    <InputNumber class="col-12 form-control" min="0.00" step="0.01" @bind-Value="model.amount" />
+                    <InputNumber class="col-12 form-control rounded-start" min="0.00" step="0.01" @bind-Value="model.amount" />
                     <label class="input-group-text">zł</label>
                 </div>
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Data transakcji</label>
-                    <InputDate class="col-12 form-control" @bind-Value="model.date_transaction" />
+                    <InputDate class="col-12 form-control rounded" @bind-Value="model.date_transaction" />
                 </div>
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Typ</label>
-                    <InputSelect class="col-12 form-select" @bind-Value="model.ListTransactions" >
+                    <InputSelect class="col-12 form-select rounded" @bind-Value="model.ListTransactions" >
                         @foreach (var Transaction in Enum.GetValues(typeof(ListTransactions)))
                         {
                                 <option value="@Transaction">@Transaction</option>

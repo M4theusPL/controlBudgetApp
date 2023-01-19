@@ -17,12 +17,12 @@
 {
     <EditForm Model="model">
         <div class="row justify-content-md-center">
-            <div class="col-5 border p-3 mb-2 bg-light text-dark text-center rounded">
+                <div class="col-xs-10 col-md-9 col-lg-7 col-xl-6 col-xxl-5 mb-2 border p-3 bg-light text-dark text-center rounded">
                 <p class="fs-4 fw-bold">
                     Tworzenie grupy
                 </p>
                 <div class="input-group mb-3">
-                    <label class="col-sm-5 input-group-text" >Nazwa grupy</label>
+                    <label class="input-group-text" >Nazwa grupy</label>
                     <InputText class="form-control" maxlength="40" @bind-Value="model.groupname" />
                 </div>
 
@@ -38,7 +38,7 @@ else
             <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
                 <p class="fs-4 fw-bold">Ustawienia grupy: @nameGroupDisplay</p>
 
-                <div class="table">
+                <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr class="fw-bold">
@@ -92,7 +92,8 @@ else
         <div class="row justify-content-md-center text-center">
             
             <div class="col-11 border p-3 mb-2 bg-light text-dark rounded">
-                    <p class="fs-4 fw-bold">Lista użytkowników grupy: @nameGroupDisplay</p>
+                <p class="fs-4 fw-bold">Lista użytkowników grupy: @nameGroupDisplay</p>
+                <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr class="fw-bold">
@@ -113,6 +114,7 @@ else
                             }
                         </tbody>
                     </table>
+                </div>
             </div>
         </div>
      </AuthorizeView>
