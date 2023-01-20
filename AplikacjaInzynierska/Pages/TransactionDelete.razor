@@ -43,6 +43,7 @@
 
         log.event_log = "successful delete transaction ID: " + IdTransaction;
         logsService.AddNewEvent(log);
+        log = new LogsClass();
         navManager.NavigateTo("/listtransaction/", true);
 
         return true;
@@ -62,7 +63,7 @@
 
         log.event_log = "canceled delete transaction ID: " + IdTransaction;
         logsService.AddNewEvent(log);
-
+        log = new LogsClass();
         navManager.NavigateTo("/transaction/" + IdTransaction, true);
 
         return true;

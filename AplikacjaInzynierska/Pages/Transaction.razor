@@ -309,7 +309,7 @@
 
         log.event_log = "successful update transaction ID: " + model.id_user_transaction;
         logsService.AddNewEvent(log);
-
+        log = new LogsClass();
         return true;
     }
 

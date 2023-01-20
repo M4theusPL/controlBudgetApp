@@ -19,7 +19,9 @@ namespace AplikacjaInzynierska.Services
         
         public List<UsersClass> displayUsersGroup(int id)
         {
-            return _dbcontext.users.Where(x => x.id_group == id).ToList();
+            var listUsersGroup = _dbcontext.users.Where(x => x.id_group == id);
+            listUsersGroup = listUsersGroup.OrderBy(x => x.admin_group);
+            return listUsersGroup.ToList();
         }
 
         public UsersClass? GetByUserEmail(string email)
