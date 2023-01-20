@@ -3,7 +3,6 @@ using AplikacjaInzynierska.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
-using System.Configuration;
 using AplikacjaInzynierska.Services;
 using Microsoft.Extensions.Azure;
 
@@ -22,7 +21,7 @@ builder.Services.AddScoped<UsersService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<LogsService>();
-builder.Services.AddScoped<FilesService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAzureClients(clientBuilder =>
 {
     clientBuilder.AddBlobServiceClient(builder.Configuration["CustomBudgetApp:blob"], preferMsi: true);

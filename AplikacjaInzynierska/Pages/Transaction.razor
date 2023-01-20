@@ -8,7 +8,6 @@
 @inject TransactionService transactionService
 @inject UsersService userService
 @inject LogsService logsService
-@inject FilesService filesService
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims;
 
@@ -178,11 +177,9 @@
 
     Model model = new Model();
     LogsClass log = new LogsClass();
-    FilesClass filee = new FilesClass();
 
     public string addedBy = "";
     public bool showGroup = false;
-    private FilesClass _selectedFile;
 
     class Model
     {
@@ -204,38 +201,12 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    //private async Task HandleFileSelected(InputFileChangeEventArgs e)
-    //{
-    //    var file = e.File;
-    //    using (var stream = file.OpenReadStream())
-    //    {
-    //        var fileContent = new byte[file.Size];
-    //        await stream.ReadAsync(fileContent, 0, (int)file.Size);
-    //        Console.WriteLine(System.Text.Encoding.UTF8.GetString(fileContent));
-    //        _selectedFile = new FilesClass
-    //            {
-    //                filename = file.Name,
-    //                filesize = file.Size,
-    //                id_user = 1,
-    //                id_user_transaction = 1,
-    //                attachment = fileContent
-    //            };
-    //    }
-    //}
-
-    //private string fileDownloadUrl;
-    //private string fileName;
-    //[Inject]
-    //private NavigationManager NavigationManager { get; set; }
-
-
     protected override async Task OnInitializedAsync()
     {
         var transactionInformation = transactionService.GetByTransaction(IdTransaction);
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         var userInformation = userService.GetByUserEmail(claimEmail);
-        var fileInformation = filesService.GetByFile(7);
 
         if (transactionInformation == null)
         {
@@ -270,12 +241,6 @@
                 model.date_transaction = transactionInformation.date_transaction;
                 string type_transaction = transactionInformation.type_transaction;
                 model.ListTransactions = (ListTransactions)Enum.Parse(typeof(ListTransactions), type_transaction);
-
-                //if (filee != null && filee.attachment != null)
-                //{
-                //    fileDownloadUrl = "data:application/octet-stream;base64," + Convert.ToBase64String(filee.attachment);
-                //    fileName = filee.filename;
-                //}
             }
             else
             {
@@ -302,13 +267,6 @@
                         var userAdded = userService.GetByUserIdGroup(transactionInformation.id_user);
                         addedBy = userAdded.email;
                         showGroup = true; 
-
-                        //if (filee != null)
-                        //{
-                        //    fileDownloadUrl = "data:application/octet-stream;base64," + Convert.ToBase64String(filee.attachment);
-                        //    fileName = filee.filename;
-                        //}
-
                     }
                     else
                     {
@@ -326,7 +284,7 @@
 
     public async Task<bool> EditTransaction()
     {
-        TransactionsClass gu = new TransactionsClass();
+        TransactionsClass tc = new TransactionsClass();
 
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
@@ -338,19 +296,13 @@
         log.time = TimeOnly.Parse(timeNow);
         log.id_user = userInformation.id_user;
 
-        gu.id_user_transaction = model.id_user_transaction;
-        gu.name_transaction = model.name_transaction;
-        gu.description = model.description;
-        gu.amount = model.amount;
-        gu.date_transaction = model.date_transaction;
-        gu.type_transaction = model.ListTransactions.ToString();
-        transactionService.EditTransaction(gu);
-
-        //if (_selectedFile != null)
-        //{
-        //    await filesService.AddNewFile(_selectedFile);
-        //}
-
+        tc.id_user_transaction = model.id_user_transaction;
+        tc.name_transaction = model.name_transaction;
+        tc.description = model.description;
+        tc.amount = model.amount;
+        tc.date_transaction = model.date_transaction;
+        tc.type_transaction = model.ListTransactions.ToString();
+        transactionService.EditTransaction(tc);
 
         js.InvokeVoidAsync("alert", "Pomyślny update!");
 

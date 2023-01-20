@@ -152,7 +152,7 @@ else
             DateTime dateNowPdf = DateTime.Now.ToUniversalTime();
             document.Open();
 
-            Paragraph paragraph = new Paragraph("NAZWA APLIKACJI", new Font(Font.HELVETICA, 21, Font.BOLD));
+            Paragraph paragraph = new Paragraph("controlBudgetApp", new Font(Font.HELVETICA, 21, Font.BOLD));
             paragraph.Alignment = Element.ALIGN_LEFT;
             document.Add(paragraph);
             document.Add(new Paragraph(" "));

@@ -13,6 +13,5 @@ namespace AplikacjaInzynierska.Data
         public DbSet<GroupClass> group { get; set; }
         public DbSet<TransactionsClass> transactions { get; set; }
         public DbSet<LogsClass> logs { get; set; }
-        public DbSet<FilesClass> files { get; set; }
     }
 }
