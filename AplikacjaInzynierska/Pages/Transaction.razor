@@ -64,28 +64,6 @@
                         }
                     </InputSelect>
                 </div>
-
-                <div class="input-group mb-3">
-                        <label class="col-4 col-lg-5 input-group-text">Załącznik</label>
-                       @* <InputFile OnChange="HandleFileSelected" />*@
-                <!-- add file -->
-                @*<InputFile OnChange=""/>*@
-                @*@foreach(var inv in Invs)
-                {
-                        
-                            @*<InputFile OnChange="@(e => HandleFileSelected(e, inv.id_file))" multiple  /> *@
-                                @*<input type="file" onchange="@(e => HandleFileSelected(e, inv.id_file))">*@
-                            @*
-                
-
-                    @if (inv.attachment != null)
-                    {
-                        <button @onclick="@(e=>DownloadPdf(inv.id_file))">pobierz</button>
-                        <button @onclick="@(e=>DeletePdf(inv.id_file))">usun</button>
-                    }
-                
-                }*@
-                </div>
             </div>
 
              <div class="container d-lg-none d-xl-none d-xxl-nonek">
@@ -132,39 +110,12 @@
                         }
                     </InputSelect>
                 </div>
-
-                <div class="input-group mb-3">
-                        <label class="col-12 input-group-text">Załącznik</label>
-                       @* <InputFile OnChange="HandleFileSelected" />*@
-                <!-- add file -->
-                @*<InputFile OnChange=""/>*@
-                @*@foreach(var inv in Invs)
-                {
-                        
-                            @*<InputFile OnChange="@(e => HandleFileSelected(e, inv.id_file))" multiple  /> *@
-                                @*<input type="file" onchange="@(e => HandleFileSelected(e, inv.id_file))">*@
-                            @*
-                
-
-                    @if (inv.attachment != null)
-                    {
-                        <button @onclick="@(e=>DownloadPdf(inv.id_file))">pobierz</button>
-                        <button @onclick="@(e=>DeletePdf(inv.id_file))">usun</button>
-                    }
-                
-                }*@
-                </div>
             </div>
 
             <div>
                 <button type="button" class="btn btn-success" @onclick="EditTransaction" >Edytuj transakcję</button>
                 <button type="button" class="btn btn-danger" @onclick="DeleteTransaction" >Usuń transakcję</button>
             </div>
-
-            <br /><br />
-
-            @*<a href="@fileDownloadUrl" download="@fileName">Download</a>*@
-
         </div>
     </div>
 
