@@ -215,7 +215,7 @@
                         string type_transaction = transactionInformation.type_transaction;
                         model.ListTransactions = (ListTransactions)Enum.Parse(typeof(ListTransactions), type_transaction);
 
-                        var userAdded = userService.GetByUserIdGroup(transactionInformation.id_user);
+                        var userAdded = userService.GetByUserIdUser(transactionInformation.id_user);
                         addedBy = userAdded.email;
                         showGroup = true; 
                     }
