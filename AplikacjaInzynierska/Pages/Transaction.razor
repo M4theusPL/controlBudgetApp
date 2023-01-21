@@ -255,7 +255,7 @@
         tc.type_transaction = model.ListTransactions.ToString();
         transactionService.EditTransaction(tc);
 
-        js.InvokeVoidAsync("alert", "Pomyślny update!");
+        js.InvokeVoidAsync("alert", "Pomyślna aktualizacja transakcji!");
 
 
         log.event_log = "successful update transaction ID: " + model.id_user_transaction;
