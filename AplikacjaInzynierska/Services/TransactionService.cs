@@ -261,7 +261,7 @@ namespace AplikacjaInzynierska.Services
                 editTrans.name_transaction = tc.name_transaction;
                 editTrans.description = tc.description;
                 editTrans.amount = tc.amount;
-                editTrans.date_transaction = tc.date_transaction.ToUniversalTime().AddDays(1);
+                editTrans.date_transaction = tc.date_transaction.ToUniversalTime();
                 editTrans.type_transaction = tc.type_transaction;
 
                 _dbcontext.transactions.Update(editTrans);
@@ -284,7 +284,7 @@ namespace AplikacjaInzynierska.Services
                 {
                     rt.id_user = id_user;
                     rt.id_group = 0;
-                    rt.date_transaction = rt.date_transaction.ToUniversalTime().AddDays(1);
+                    rt.date_transaction = rt.date_transaction.ToUniversalTime();
                     _dbcontext.transactions.Update(rt);
                 }
                 _dbcontext.SaveChanges();
@@ -306,7 +306,7 @@ namespace AplikacjaInzynierska.Services
                 {
                     at.id_user = id_user;
                     at.id_group = id_group;
-                    at.date_transaction = at.date_transaction.ToUniversalTime().AddDays(1);
+                    at.date_transaction = at.date_transaction.ToUniversalTime();
                     _dbcontext.transactions.Update(at);
                 }
                 

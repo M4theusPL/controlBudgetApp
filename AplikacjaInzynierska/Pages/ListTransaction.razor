@@ -141,7 +141,7 @@ else
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
-        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.date = DateTime.Parse(dateNow).ToUniversalTime();
         log.time = TimeOnly.Parse(timeNow);
         log.id_user = Convert.ToInt32(claimIdUser);
 
@@ -152,12 +152,15 @@ else
             DateTime dateNowPdf = DateTime.Now.ToUniversalTime();
             document.Open();
 
-            Paragraph paragraph = new Paragraph("controlBudgetApp", new Font(Font.HELVETICA, 21, Font.BOLD));
+            BaseFont baseFont = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1250, BaseFont.EMBEDDED);
+            Font font = new Font(baseFont, 21, Font.BOLD);
+            Paragraph paragraph = new Paragraph("controlBudgetApp", font);
             paragraph.Alignment = Element.ALIGN_LEFT;
             document.Add(paragraph);
             document.Add(new Paragraph(" "));
 
-            paragraph = new Paragraph("Raport z dnia " + dateNowPdf.ToString("yyyy-MM-dd"), new Font(Font.HELVETICA, 18, Font.BOLD));
+            font = new Font(baseFont, 18, Font.BOLD);
+            paragraph = new Paragraph("Raport z dnia " + dateNowPdf.ToString("yyyy-MM-dd"), font);
             paragraph.Alignment = Element.ALIGN_CENTER;
             document.Add(paragraph);
             document.Add(new Paragraph(" "));
@@ -166,28 +169,36 @@ else
             float[] widths = new float[] { 40f, 100f, 150f, 75f, 110f };
             table.SetWidths(widths);
 
-            PdfPCell cell = new PdfPCell(new Phrase("ID", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            font = new Font(baseFont, 12, Font.BOLD);
+            PdfPCell cell = new PdfPCell(new Phrase("ID", font));
             table.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Nazwa", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            cell = new PdfPCell(new Phrase("Nazwa", font));
             table.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Opis", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            cell = new PdfPCell(new Phrase("Opis", font));
             table.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Kwota", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            cell = new PdfPCell(new Phrase("Kwota", font));
             table.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Data transakcji", new Font(Font.HELVETICA, 12, Font.BOLD)));
+            cell = new PdfPCell(new Phrase("Data transakcji", font));
             table.AddCell(cell);
 
+            
+            font = new Font(baseFont, 12, Font.NORMAL);
             foreach (var item in transClass)
             {
-                table.AddCell(item.id_user_transaction.ToString());
-                table.AddCell(item.name_transaction);
-                table.AddCell(item.description);
-                table.AddCell(item.amount.ToString());
-                table.AddCell(item.date_transaction.ToString("yyyy-MM-dd"));
+                cell = new PdfPCell(new Phrase(item.id_user_transaction.ToString(), new Font(Font.TIMES_ROMAN, 12, Font.NORMAL)));
+                table.AddCell(cell);
+                cell = new PdfPCell(new Phrase(item.name_transaction, font));
+                table.AddCell(cell);
+                cell = new PdfPCell(new Phrase(item.description, font));
+                table.AddCell(cell);
+                cell = new PdfPCell(new Phrase(item.amount.ToString(), font));
+                table.AddCell(cell);
+                cell = new PdfPCell(new Phrase(item.date_transaction.ToString("yyyy-MM-dd"), new Font(Font.TIMES_ROMAN, 12, Font.NORMAL)));
+                table.AddCell(cell);
             }
 
             document.Add(table);

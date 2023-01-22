@@ -131,7 +131,7 @@
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
 
-        log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+        log.date = DateTime.Parse(dateNow).ToUniversalTime();
         log.time = TimeOnly.Parse(timeNow);
         log.id_user = userInformation.id_user;
 
@@ -141,7 +141,7 @@
         tc.name_transaction = model.name_transaction;
         tc.description = model.description;
         tc.amount = model.amount;
-        tc.date_transaction = model.date_transaction.ToUniversalTime().AddDays(1);
+        tc.date_transaction = model.date_transaction.ToUniversalTime();
         tc.type_transaction = model.ListTransactions.ToString();
         transactionService.AddNewTransaction(tc);
         var topId = transactionService.showTopIdTransactionUser(userInformation.id_user);

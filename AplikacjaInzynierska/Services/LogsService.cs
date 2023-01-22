@@ -14,6 +14,7 @@ namespace AplikacjaInzynierska.Services
 
         public bool AddNewEvent(LogsClass log)
         {
+            log.time = log.time.AddHours(1);
             _dbcontext.logs.Add(log);
             _dbcontext.SaveChanges();
             return true;

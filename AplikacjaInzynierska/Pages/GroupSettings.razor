@@ -169,7 +169,7 @@ else
             var userInformation = usersService.GetByUserEmail(claimEmail);
             var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
             var timeNow = DateTime.Now.ToString("HH:mm:ss");
-            log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+            log.date = DateTime.Parse(dateNow).ToUniversalTime();
             log.time = TimeOnly.Parse(timeNow);
             log.id_user = userInformation.id_user;
             log.event_log = "successful created group: " + model.groupname;
@@ -207,7 +207,7 @@ else
 
             var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
             var timeNow = DateTime.Now.ToString("HH:mm:ss");
-            log.date = DateTime.Parse(dateNow).ToUniversalTime().AddDays(1);
+            log.date = DateTime.Parse(dateNow).ToUniversalTime();
             log.time = TimeOnly.Parse(timeNow);
 
             log.id_user = userInformation.id_user;

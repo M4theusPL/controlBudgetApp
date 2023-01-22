@@ -62,7 +62,7 @@ namespace AplikacjaInzynierska.Services
                     checkUser.email = uc.email;
                     checkUser.name = uc.name;
                     checkUser.surname = uc.surname;
-                    checkUser.date_birthday = uc.date_birthday.ToUniversalTime().AddDays(1);
+                    checkUser.date_birthday = uc.date_birthday.ToUniversalTime();
                     checkUser.password = checkUser.password;
                     _dbcontext.users.Update(checkUser);
                     _dbcontext.SaveChanges();
@@ -74,7 +74,7 @@ namespace AplikacjaInzynierska.Services
                     checkUserWithPassword.email = uc.email;
                     checkUserWithPassword.name = uc.name;
                     checkUserWithPassword.surname = uc.surname;
-                    checkUserWithPassword.date_birthday = uc.date_birthday.ToUniversalTime().AddDays(1);
+                    checkUserWithPassword.date_birthday = uc.date_birthday.ToUniversalTime();
                     checkUserWithPassword.password = newpassword;
                     _dbcontext.users.Update(checkUserWithPassword);
                     _dbcontext.SaveChanges();
@@ -97,7 +97,7 @@ namespace AplikacjaInzynierska.Services
                 update.name = uc.name;
                 update.surname = uc.surname;
                 update.password = update.password;
-                update.date_birthday = update.date_birthday.ToUniversalTime().AddDays(1);
+                update.date_birthday = update.date_birthday.ToUniversalTime();
                 update.admin_group = uc.admin_group;
                 update.id_group = update.id_group;
                 _dbcontext.users.Update(update);
@@ -118,7 +118,7 @@ namespace AplikacjaInzynierska.Services
             {
                 remove.email = remove.email;
                 remove.password = remove.password;
-                remove.date_birthday = remove.date_birthday.ToUniversalTime().AddDays(1);
+                remove.date_birthday = remove.date_birthday.ToUniversalTime();
                 remove.admin_group = "Admin";
                 remove.id_group = 0;
                 _dbcontext.users.Update(remove);
