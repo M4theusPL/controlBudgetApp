@@ -152,7 +152,7 @@ else
             DateTime dateNowPdf = DateTime.Now.ToUniversalTime();
             document.Open();
 
-            BaseFont baseFont = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1250, BaseFont.EMBEDDED);
+            BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1250, BaseFont.EMBEDDED);
             Font font = new Font(baseFont, 21, Font.BOLD);
             Paragraph paragraph = new Paragraph("controlBudgetApp", font);
             paragraph.Alignment = Element.ALIGN_LEFT;
@@ -189,7 +189,7 @@ else
             font = new Font(baseFont, 12, Font.NORMAL);
             foreach (var item in transClass)
             {
-                cell = new PdfPCell(new Phrase(item.id_user_transaction.ToString(), new Font(Font.TIMES_ROMAN, 12, Font.NORMAL)));
+                cell = new PdfPCell(new Phrase(item.id_user_transaction.ToString(), font));
                 table.AddCell(cell);
                 cell = new PdfPCell(new Phrase(item.name_transaction, font));
                 table.AddCell(cell);
@@ -197,7 +197,7 @@ else
                 table.AddCell(cell);
                 cell = new PdfPCell(new Phrase(item.amount.ToString(), font));
                 table.AddCell(cell);
-                cell = new PdfPCell(new Phrase(item.date_transaction.ToString("yyyy-MM-dd"), new Font(Font.TIMES_ROMAN, 12, Font.NORMAL)));
+                cell = new PdfPCell(new Phrase(item.date_transaction.ToString("yyyy-MM-dd"), font));
                 table.AddCell(cell);
             }
 

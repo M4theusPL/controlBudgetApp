@@ -35,11 +35,6 @@
                 </div>
 
                 <div class="input-group mb-3">
-                    <label class="col-sm-5 input-group-text" >Nazwa transakcji</label>
-                    <InputText class="col-8 col-lg-7 form-control" id="nameTransaction" @bind-Value="model.name_transaction" />
-                </div>
-
-                <div class="input-group mb-3">
                     <label class="col-sm-5 input-group-text" >Opis</label>
                     <InputTextArea class="col-8 col-lg-7 form-control" maxlength="250" @bind-Value="model.description"/>
                 </div>
@@ -74,11 +69,6 @@
                         <InputText class="col-12 form-control rounded" @bind-Value="@addedBy" ReadOnly="true" />
                     </div>
                 }
-
-                <div class="input-group mb-3">
-                    <label class="col-12 input-group-text" >Nazwa transakcji</label>
-                    <InputText class="col-12 form-control rounded" id="nameTransaction" @bind-Value="model.name_transaction" />
-                </div>
 
                 <div class="input-group mb-3">
                     <label class="col-12 input-group-text" >Nazwa transakcji</label>
