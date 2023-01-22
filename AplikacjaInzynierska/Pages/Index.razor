@@ -266,9 +266,9 @@
                         _configYear.Data.Labels.Add(typeTransaction);
                     }
 
-                    double expenditureYear = transactionService.ExpenditureGroupYear(Int32.Parse(claimIdUser));
-                    double proceedsYear = transactionService.ProceedsGroupYear(Int32.Parse(claimIdUser));
-                    double investmentYear = transactionService.InvestmentGroupYear(Int32.Parse(claimIdUser));
+                    double expenditureYear = transactionService.ExpenditureYear(Int32.Parse(claimIdUser));
+                    double proceedsYear = transactionService.ProceedsYear(Int32.Parse(claimIdUser));
+                    double investmentYear = transactionService.InvestmentYear(Int32.Parse(claimIdUser));
 
                     if (expenditureYear == 0 && proceedsYear == 0 && investmentYear == 0)
                     {

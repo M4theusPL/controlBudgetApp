@@ -227,7 +227,7 @@
                         js.InvokeVoidAsync("alert", "Pomyślna aktualizacja konta.");
                         log.event_log = "successful update account permisions (admin): " + uc.id_user;
                         if ((claimEmail != model.email && userInformation.id_user == IdUser) || (roleGroup != userInformation.admin_group && userInformation.id_user == IdUser))
-                    {
+                        {
                             js.InvokeVoidAsync("alert", "Proszę o zalogowanie się ponownie.");
                             var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
                             await customAuthStateProvider.UpdateAuthenticationState(null);
@@ -355,6 +355,7 @@
         var userInformation = userService.GetByUserEmail(claimEmail);
         int inGroupU = await userService.InGroupUsers(userInformation.id_group);
         int inGroupA = await userService.InGroupAdmin(userInformation.id_group);
+        var idAdmin = userService.IdAdmin(IdGroup);
 
         if (inGroupU >= 2)
         {
@@ -362,7 +363,7 @@
             {
                 navManager.NavigateTo("/userdeletefromgroup/" + IdUser + "/" + IdGroup, true);
             }
-            else if (inGroupA == 1 && userInformation.id_group != IdUser)
+            else if (inGroupA == 1 && IdUser != idAdmin.id_user)
             {
                 navManager.NavigateTo("/userdeletefromgroup/" + IdUser + "/" + IdGroup, true);
             }

@@ -181,5 +181,10 @@ namespace AplikacjaInzynierska.Services
             int admins = _dbcontext.users.Where(u => u.id_group == id_group && u.admin_group == "Admin").Count();
             return admins;
         }
+
+        public UsersClass? IdAdmin(int id_group)
+        {
+            return _dbcontext.users.FirstOrDefault(u => u.id_group == id_group && u.admin_group == "Admin");
+        }
     }
 }

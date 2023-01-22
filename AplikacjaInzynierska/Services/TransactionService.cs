@@ -81,10 +81,10 @@ namespace AplikacjaInzynierska.Services
                     transactionsGroup = transactionsGroup.OrderByDescending(x => x.amount);
                     break;
                 case 9:
-                    transactionsGroup = transactionsGroup.OrderBy(x => x.date_transaction);
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.date_transaction);
                     break;
                 case 10:
-                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.date_transaction);
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.date_transaction);
                     break;
             }
 
@@ -128,10 +128,10 @@ namespace AplikacjaInzynierska.Services
                     transactionsGroup = transactionsGroup.OrderByDescending(x => x.amount);
                     break;
                 case 9:
-                    transactionsGroup = transactionsGroup.OrderBy(x => x.date_transaction);
+                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.date_transaction);
                     break;
                 case 10:
-                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.date_transaction);
+                    transactionsGroup = transactionsGroup.OrderBy(x => x.date_transaction);
                     break;
             }
 
