@@ -9,9 +9,15 @@
 @inject UsersService userService
 @inject LogsService logsService
 @using Microsoft.JSInterop
-@using iTextSharp.text;
-@using iTextSharp.text.pdf;
+@using iText.IO.Font.Constants;
+@using iText.Kernel.Font;
+@using iText.Kernel.Pdf;
+@using iText.Layout;
+@using iText.Layout.Element;
+@using iText.IO.Font;
 @using System.IO;
+@using iText.Layout.Properties;
+@using static iText.Kernel.Font.PdfFontFactory;
 @inject IJSRuntime JSRuntime
 
 <PageTitle>controlBudgetApp - Lista transakcji</PageTitle>
@@ -147,69 +153,75 @@ else
 
         using (var stream = new MemoryStream())
         {
-            var document = new Document();
-            var writer = PdfWriter.GetInstance(document, stream);
+            PdfDocument pdf = new PdfDocument(new PdfWriter(stream));
+            var document = new Document(pdf);
             DateTime dateNowPdf = DateTime.Now.ToUniversalTime();
-            document.Open();
 
-            BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1250, BaseFont.EMBEDDED);
-            Font font = new Font(baseFont, 21, Font.BOLD);
-            Paragraph paragraph = new Paragraph("controlBudgetApp", font);
-            paragraph.Alignment = Element.ALIGN_LEFT;
+            PdfFont font = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD, "Cp1250", EmbeddingStrategy.PREFER_EMBEDDED);
+            Paragraph paragraph = new Paragraph("controlBudgetApp").SetFont(font).SetFontSize(21);
+            paragraph.SetTextAlignment(TextAlignment.LEFT);
             document.Add(paragraph);
             document.Add(new Paragraph(" "));
 
-            font = new Font(baseFont, 18, Font.BOLD);
-            paragraph = new Paragraph("Raport z dnia " + dateNowPdf.ToString("yyyy-MM-dd"), font);
-            paragraph.Alignment = Element.ALIGN_CENTER;
+            paragraph = new Paragraph("Raport z dnia " + dateNowPdf.ToString("yyyy-MM-dd")).SetFont(font).SetFontSize(18);
+            paragraph.SetTextAlignment(TextAlignment.CENTER);
             document.Add(paragraph);
             document.Add(new Paragraph(" "));
 
-            var table = new PdfPTable(5);
-            float[] widths = new float[] { 40f, 100f, 150f, 75f, 110f };
-            table.SetWidths(widths);
+            Table table = new Table(5);
+            table.SetWidth(UnitValue.CreatePercentValue(100));
 
-            font = new Font(baseFont, 12, Font.BOLD);
-            PdfPCell cell = new PdfPCell(new Phrase("ID", font));
+            paragraph = new Paragraph("ID").SetFont(font).SetFontSize(12);
+            Cell cell = new Cell(1, 1).Add(paragraph).SetWidth(40);
             table.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Nazwa", font));
+            paragraph = new Paragraph("Nazwa").SetFont(font).SetFontSize(12);
+            cell = new Cell(1, 1).Add(paragraph).SetWidth(100);
             table.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Opis", font));
+            paragraph = new Paragraph("Opis").SetFont(font).SetFontSize(12);
+            cell = new Cell(1, 1).Add(paragraph).SetWidth(150);
             table.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Kwota", font));
+            paragraph = new Paragraph("Kwota").SetFont(font).SetFontSize(12);
+            cell = new Cell(1, 1).Add(paragraph).SetWidth(75);
             table.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Data transakcji", font));
+            paragraph = new Paragraph("Data transakcji").SetFont(font).SetFontSize(12);
+            cell = new Cell(1, 1).Add(paragraph).SetWidth(110);
             table.AddCell(cell);
 
-            
-            font = new Font(baseFont, 12, Font.NORMAL);
+
+            font = PdfFontFactory.CreateFont(StandardFonts.HELVETICA, "Cp1250", EmbeddingStrategy.PREFER_EMBEDDED);
             foreach (var item in transClass)
             {
-                cell = new PdfPCell(new Phrase(item.id_user_transaction.ToString(), font));
+                paragraph = new Paragraph(item.id_user_transaction.ToString()).SetFont(font).SetFontSize(12);
+                cell = new Cell().Add(paragraph);
                 table.AddCell(cell);
-                cell = new PdfPCell(new Phrase(item.name_transaction, font));
+                paragraph = new Paragraph(item.name_transaction).SetFont(font).SetFontSize(12);
+                cell = new Cell().Add(paragraph);
                 table.AddCell(cell);
-                cell = new PdfPCell(new Phrase(item.description, font));
+                paragraph = new Paragraph(item.description).SetFont(font).SetFontSize(12);
+                cell = new Cell().Add(paragraph);
                 table.AddCell(cell);
-                cell = new PdfPCell(new Phrase(item.amount.ToString(), font));
+                paragraph = new Paragraph(Convert.ToString(item.amount)).SetFont(font).SetFontSize(12);
+                cell = new Cell().Add(paragraph);
                 table.AddCell(cell);
-                cell = new PdfPCell(new Phrase(item.date_transaction.ToString("yyyy-MM-dd"), font));
+                paragraph = new Paragraph(item.date_transaction.ToString("yyyy-MM-dd")).SetFont(font).SetFontSize(12);
+                cell = new Cell().Add(paragraph);
                 table.AddCell(cell);
             }
 
             document.Add(table);
             document.Close();
-            var fileBytes = stream.ToArray();
+            pdf.Close();
+            byte[] fileBytes = stream.ToArray();
 
             await JSRuntime.InvokeAsync<string>("ShowPDF", Convert.ToBase64String(fileBytes));
             log.event_log = "created PDF";
             logsService.AddNewEvent(log);
             log = new LogsClass();
-            return stream.ToArray();
+            return fileBytes;
         }
 
     }

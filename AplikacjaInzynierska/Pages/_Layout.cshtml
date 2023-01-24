@@ -43,8 +43,8 @@
 
             var link = document.createElement("a");
             document.body.appendChild(link);
-            link.download = fileName;
-            link.href = "data:" + fileType + ";base64," + fileBytes;
+            link.setAttribute("download", fileName);
+            link.setAttribute("href", "data:" + fileType + ";base64," + fileBytes);
             link.click();
             document.body.removeChild(link);
         }
