@@ -55,7 +55,7 @@
 
         if (model.email == null || model.password == null)
         {
-            await js.InvokeVoidAsync("alert", "Podano zły login lub hasło!");
+            await js.InvokeVoidAsync("alert", "Podano zły email lub hasło!");
             return;
         }
         else
@@ -67,7 +67,7 @@
 
             if (userAccount == null || userAccount.password != passwordHashed)
             {
-                await js.InvokeVoidAsync("alert", "Podano zły login lub hasło!");
+                await js.InvokeVoidAsync("alert", "Podano zły email lub hasło!");
 
                 log.id_user = 0;
                 log.event_log = "failed login to: " + model.email;
