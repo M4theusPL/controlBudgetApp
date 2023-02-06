@@ -55,7 +55,7 @@ else
 
                                 <div class="col-xs-4 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-4">
                                     <div class="input-group mb-2">
-                                        <label class="input-group-text">sortuj od</label>
+                                        <label class="input-group-text">Sortuj od</label>
                                         <select class="form-select" Id="CountryList" @bind="SelectedValue" @bind:event="oninput" @onchange="@FilterChanged">
                                             @foreach (var item in Filters)
                                             {
@@ -142,8 +142,6 @@ else
     {
         var authState = await authenticationState;
         var claimIdUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var userInformation = userService.GetByUserEmail(claimEmail);
 
         var dateNow = DateTime.Now.ToString("yyyy-MM-dd");
         var timeNow = DateTime.Now.ToString("HH:mm:ss");
@@ -231,8 +229,6 @@ else
         var authState = await authenticationState;
         var claimEmail = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         var userInformation = userService.GetByUserEmail(claimEmail);
-
-        await JSRuntime.InvokeAsync<object>("console.log", SelectedValue);
 
         if (userInformation.id_group == 0)
         {

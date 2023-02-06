@@ -46,7 +46,7 @@ namespace AplikacjaInzynierska.Services
 
         public List<TransactionsClass> displaySearchTransaction(int id_user, string searchedText, int selectedValue)
         {
-            var transactionsGroup = _dbcontext.transactions.Where(x => x.id_user == id_user
+            var transactionsUser = _dbcontext.transactions.Where(x => x.id_user == id_user
             && (EF.Functions.Like(x.name_transaction, $"%{searchedText}%")
             || EF.Functions.Like(x.description, $"%{searchedText}%")
             || EF.Functions.Like((string?)Convert.ToString(x.amount), $"%{searchedText}%")
@@ -57,38 +57,38 @@ namespace AplikacjaInzynierska.Services
             switch (selectedValue)
             {
                 case 1:
-                    transactionsGroup = transactionsGroup.OrderBy(x => x.id_user_transaction);
+                    transactionsUser = transactionsUser.OrderBy(x => x.id_user_transaction);
                     break;
                 case 2:
-                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.id_user_transaction);
+                    transactionsUser = transactionsUser.OrderByDescending(x => x.id_user_transaction);
                     break;
                 case 3:
-                    transactionsGroup = transactionsGroup.OrderBy(x => x.name_transaction);
+                    transactionsUser = transactionsUser.OrderBy(x => x.name_transaction);
                     break;
                 case 4:
-                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.name_transaction);
+                    transactionsUser = transactionsUser.OrderByDescending(x => x.name_transaction);
                     break;
                 case 5:
-                    transactionsGroup = transactionsGroup.OrderBy(x => x.description);
+                    transactionsUser = transactionsUser.OrderBy(x => x.description);
                     break;
                 case 6:
-                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.description);
+                    transactionsUser = transactionsUser.OrderByDescending(x => x.description);
                     break;
                 case 7:
-                    transactionsGroup = transactionsGroup.OrderBy(x => x.amount);
+                    transactionsUser = transactionsUser.OrderBy(x => x.amount);
                     break;
                 case 8:
-                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.amount);
+                    transactionsUser = transactionsUser.OrderByDescending(x => x.amount);
                     break;
                 case 9:
-                    transactionsGroup = transactionsGroup.OrderByDescending(x => x.date_transaction);
+                    transactionsUser = transactionsUser.OrderByDescending(x => x.date_transaction);
                     break;
                 case 10:
-                    transactionsGroup = transactionsGroup.OrderBy(x => x.date_transaction);
+                    transactionsUser = transactionsUser.OrderBy(x => x.date_transaction);
                     break;
             }
 
-            return transactionsGroup.ToList();
+            return transactionsUser.ToList();
         }
 
         public List<TransactionsClass> displayGroupSearchTransaction(int id_group, string searchedText, int selectedValue)
